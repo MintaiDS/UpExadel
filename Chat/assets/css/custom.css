@@ -1,0 +1,195 @@
+/* this is a custom css stylessheet*/
+
+footer {
+	padding: 2em 0;
+	margin: 3em 0;
+	border-top: 1px solid #ddd;
+	color: #999;
+	text-align: center;
+
+}
+
+.MyHeader {
+	
+	height: 100px;
+    border: 2px solid #E74C30;
+    background-color: #E74C30;
+    margin-bottom: -14px;
+    
+    
+}
+
+.glyphicon {
+	color: #BDBDBD;
+}
+
+.glyphicon-pushpin,
+.glyphicon-heart{
+	color: #4f2b22;
+}
+
+.pull-right.img-responsive{
+	margin: 0 0 1em 1em;
+}
+
+.btn-info{
+	background-color: #363636;
+	border-color: #363636;
+	color: white;
+
+}
+
+btn-info.active,
+ .btn-info.focus,
+  .btn-info:active,
+   .btn-info:focus,
+    .btn-info:hover,
+     .open .dropdown-toggle.btn-info {
+
+     	color: white;
+     	background-color: #363636;
+     	border-color: #363636;
+
+     }
+
+.panel-default{
+	background-color: #F5F5F5;
+	border-radius: 0px;
+
+}
+
+.panel-footer{
+	background-color: #EAEAEA;
+
+
+}
+
+
+.panel-online{
+	margin-top: 30px;
+	box-shadow: none;
+	border-color: #F5F5F5
+}
+.panel-online > .panel-heading{
+	color: black;
+	background-color: #F5F5F5;
+	padding-left: 0px;
+	padding-bottom: 7px;
+	border: 0px solid #F5F5F5;
+	border-bottom: 1px solid #EAEAEA;
+
+}
+
+.topic > h3{
+
+color: black;
+font-size: 28px;
+font-weight: 600;
+
+}
+
+.topic > h4{
+
+
+color: #BDBDBD;
+font-size: 14px;
+padding-top: -10px;
+margin-top: -6px;
+
+}
+
+
+
+
+
+.mes{
+	border: 1px solid #F8F5F5;
+	border-radius: 5px;
+}
+
+.form-control{
+	margin-bottom: 15px;
+}
+
+.topMargin{
+	margin-top: 10px;
+	margin-bottom: -10px;
+}
+
+.custom {
+    width: 98px !important;
+
+}
+
+textarea {
+   resize: none;
+}
+
+.panel-info{
+	border: 1px solid #EDE6E6;
+	margin-top: 10px;
+}
+
+.panel-info>.panel-body{
+	height: 600px;
+	overflow: auto;
+}
+.usersOnline{
+	background-color: #F5F5F5;
+	border: 0px;
+	padding-left: 0px;
+	padding-top: 12px;
+	color: #BDBDBD;
+	
+}
+
+.media.online{
+	margin-top: 8px;
+	line-height: 32px;
+
+}
+
+.img-circle{
+	height:32px;
+	width:32px;  
+}
+
+.panel-info > .panel-body{
+	
+	margin-right: 10px;
+
+}
+
+
+
+
+
+
+.caret{
+	color: #FF9E9E;
+}
+
+/* Landscape phone to portrait tablet */
+@media (max-width: 767px) { 
+.panel-default{
+	background-color: white;
+	border: 0px;
+	box-shadow: none;
+}
+
+ }
+ 
+/* Landscape phones and down */
+@media (max-width: 480px) {
+
+.panel-default{
+	background-color: white;
+	border: 0px;
+}
+ }
+
+
+
+
+
+
