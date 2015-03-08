@@ -1,0 +1,153 @@
+/* this is a custom css stylessheet*/
+
+
+
+body {
+    background-color: #F2F2F2; 
+    font-size: 13px;
+}
+
+
+
+
+.glyphicon {
+	color: #CCD4D8;
+}
+
+
+
+.pull-right.img-responsive{
+	margin: 0 0 1em 1em;
+}
+
+.btn-info{
+	background-color: #363636;
+	border-color: #363636;
+	color: white;
+
+}
+
+btn-info.active,
+ .btn-info.focus,
+  .btn-info:active,
+   .btn-info:focus,
+    .btn-info:hover,
+     .open .dropdown-toggle.btn-info {
+
+     	color: white;
+     	background-color: #363636;
+     	border-color: #363636;
+
+     }
+
+
+
+.panel-footer{
+	background-color: #FAFAFA;
+    border: none;
+    border-radius: 0px;
+    position:absolute;
+    bottom:0;
+    
+    width: 100%;
+    padding-top:0px; 
+
+
+}
+
+
+
+
+
+
+
+
+.mes{
+	margin-top: 5px;
+	border-radius: 5px;
+}
+
+.form-control{
+	margin-bottom: 15px;
+}
+
+.media-list{
+    margin-bottom: 0px;
+}
+
+
+.custom {
+    width: 98px !important;
+
+}
+
+textarea {
+   resize: none;
+}
+
+.panel-info{
+	box-shadow: 0px 0px 3px #888888;
+    border: none;
+	height: 100vh;
+    max-width: 724px;
+    margin-bottom: 0px;
+    border-radius: 0px;
+    background-color: #FAFAFA;
+    
+}
+
+.panel-info>.panel-body{
+	height: auto;
+	overflow: auto;
+    background-color: #FAFAFA;
+}
+
+.img-circle{
+	height:50px;
+	width:50px; 
+    margin: 0.5px;
+    border-radius: 3px;
+    box-shadow: 0px 0.2px 0.2px black;
+}
+
+
+
+
+
+.col-md-12 {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+div.line{
+  transform-origin: 0 100%;
+  height: 1px; /* Line width of 3 */
+  background: #CCD4D8 ; /* Black fill */
+  margin-bottom: 20px;
+}
+
+.MessageHeader {
+    font-size: 12px;
+    color: #CCD4D8;
+    margin-bottom: 6px;
+    padding-bottom: 0px;
+    letter-spacing: 1px
+    
+}
+
+.NickName {
+    font-size: 13px;
+    font-weight: bold;
+    color: #FF6602;
+    letter-spacing: normal;
+}
+
+.media-body {
+    padding-left: 10px;
+}
+
+
+
+.Settings {
+    float: left;
+}
