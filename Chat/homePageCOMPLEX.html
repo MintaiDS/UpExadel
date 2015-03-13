@@ -12,8 +12,16 @@
     <!-- BOOTSTRAP CORE STYLE CSS -->
     <link href="css/bootstrap.css" rel="stylesheet" />
     <link href="css/custom.css" rel="stylesheet" />
+    
+    
     <script src="js/respond.js"></script>
     <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+    
+    
+    
+    
+    
+    
    
 
 
@@ -21,22 +29,23 @@
 <body style="font-family:Droid Serif">
     
      
-    
+ <main> 
   <div class="container" style="Height:100vh; max-Width:724px;">
-    <div class="row" id="mainRow"  >
+  
+    <div class="row" id="mainRow" style="max-Width:724px;"  >
 
                 
         
         <div class="col-md-12 col-sm-12">
             <div class="panel panel-info">
             
-                <div class="panel-body" style="display:none">
+                <div class="panel-body" style="opacity:0">
                     <ul class="media-list">
     
-     <li class="media hidden" > <!-- This as template For messages -->
+     <li class="media hidden" data-mesID = "1" > <!-- This as template For messages -->
         <div class="mes">
             <div class="media">
-                <a class="pull-left" href="#"><img class="media-object img-circle " src="assets/img/anton.jpg" /></a>
+                <a class="pull-left" href="#"><img class="media-object img-circle " src="assets/img/ava.png" /></a>
                 <div class="media-body" >
                     <p class="MessageHeader">
                         <span class="NickName">Anton Dosov</span> &middot 23:54 
@@ -49,7 +58,7 @@
         </div>
     </li>                   
                  
-    <li class="media">
+    <li class="media" data-mesID = "-1">
         <div class="mes">
             <div class="media">
                 <a class="pull-left" href="#"><img class="media-object img-circle " src="assets/img/anton.jpg" /></a>
@@ -65,7 +74,7 @@
         </div>
     </li>
                         
-    <li class="media">
+    <li class="media" data-mesID = "-1">
         <div class="mes">
             <div class="media">
                 <a class="pull-left" href="#"><img class="media-object img-circle " src="assets/img/taylor.jpg" /></a>
@@ -81,7 +90,7 @@
         </div>
     </li> 
 
-    <li class="media">
+    <li class="media" data-mesID = "-1">
         <div class="mes">
             <div class="media">
                 <a class="pull-left" href="#"><img class="media-object img-circle " src="assets/img/anton.jpg" /></a>
@@ -97,7 +106,7 @@
         </div>
     </li>
                         
-    <li class="media">
+    <li class="media" data-mesID = "-1" >
         <div class="mes">
             <div class="media">
                 <a class="pull-left" href="#"><img class="media-object img-circle " src="assets/img/lebron.jpg" /></a>
@@ -112,7 +121,7 @@
              </div>
         </div>
     </li>
-<li class="media">
+<li class="media" data-mesID = "-1">
         <div class="mes">
             <div class="media">
                 <a class="pull-left" href="#"><img class="media-object img-circle " src="assets/img/anton.jpg" /></a>
@@ -128,7 +137,7 @@
         </div>
     </li>
                         
-    <li class="media">
+    <li class="media" data-mesID = "-1" >
         <div class="mes">
             <div class="media">
                 <a class="pull-left" href="#"><img class="media-object img-circle " src="assets/img/dasha.jpg" /></a>
@@ -144,7 +153,7 @@
         </div>
     </li> 
 
-    <li class="media">
+    <li class="media" data-mesID = "-1" >
         <div class="mes">
             <div class="media">
                 <a class="pull-left" href="#"><img class="media-object img-circle " src="assets/img/anton.jpg" /></a>
@@ -160,7 +169,7 @@
         </div>
     </li>
                         
-    <li class="media">
+    <li class="media" data-mesID = "-1">
         <div class="mes">
             <div class="media">
                 <a class="pull-left" href="#"><img class="media-object img-circle " src="assets/img/some.jpg" /></a>
@@ -176,7 +185,7 @@
         </div>
     </li>  
                         
-   <li class="media">
+   <li class="media" data-mesID = "-1">
         <div class="mes">
             <div class="media">
                 <a class="pull-left" href="#"><img class="media-object img-circle " src="assets/img/taylor.jpg" /></a>
@@ -211,13 +220,18 @@ Love’s a game, want to play?</span>
                             <div class="col-md-10 col-sm-10">
 
                                 <textarea class="form-control" rows="3" id="MessageForm" placeholder="Enter Message ..."  ></textarea>
+                                
+                                <button   class = " btn btn-info btn-sm SettingsButton  pull-left"><span class="glyphicon glyphicon-cog"></span></button>
 
                             </div>
 
                             
 
                             <div class="col-md-2 col-sm-2 ">
+                            <div>
                             <button id="SendBtn" type ="submit" align="right" class="btn btn-info  btn-sm custom pull-right"> Speak </button>
+                            </div> 
+                                
                             </div>
 
                             
@@ -239,7 +253,7 @@ Love’s a game, want to play?</span>
 
             
 
-
+                
     
 
 
@@ -250,19 +264,26 @@ Love’s a game, want to play?</span>
 
 </div>
 </div>
+    
+     
 
-
-
+      
   </div>
+      
+    </main>  
     
     
+    	
     
     
 
   <!-- javascript -->
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.transit.js"></script>
     <script src="js/script.js"></script>
+    
+    
 
 </body>
 </html>

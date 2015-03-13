@@ -27,16 +27,34 @@ body {
 
 }
 
-btn-info.active,
- .btn-info.focus,
-  .btn-info:active,
-   .btn-info:focus,
-    .btn-info:hover,
-     .open .dropdown-toggle.btn-info {
+btn-info.active.custom,
+ .btn-info.focus.custom,
+  .btn-info:active.custom,
+   .btn-info:focus.custom,
+    .btn-info:hover.custom,
+     .open .dropdown-toggle.btn-info.custom {
 
      	color: white;
      	background-color: #363636;
      	border-color: #363636;
+         outline: none;
+
+     }
+
+btn-info.active,
+ .btn-info.focus,
+  .btn-info:active,
+   .btn-info:focus,
+    .btn-info:hover.SettingsButton,
+     .open .dropdown-toggle.btn-info.SettingsButton,
+        .SettingsButton
+        {
+
+     	color: #EBEBEB !important;
+     	background-color: #FAFAFA;
+     	border-color: #FAFAFA;
+        box-shadow: none;
+        outline: none;    
 
      }
 
@@ -51,6 +69,7 @@ btn-info.active,
     
     width: 100%;
     padding-top:0px; 
+    
 
 
 }
@@ -73,6 +92,7 @@ btn-info.active,
 
 .media-list{
     margin-bottom: 0px;
+    padding-bottom: 0px;
 }
 
 
@@ -97,9 +117,13 @@ textarea {
 }
 
 .panel-info>.panel-body{
-	height: auto;
+	
 	overflow: auto;
+    position: relative;
+    height: 100%;
     background-color: #FAFAFA;
+    margin-bottom:  0px;
+    
 }
 
 .img-circle{
@@ -150,4 +174,20 @@ div.line{
 
 .Settings {
     float: left;
+}
+
+.SettingsButton {
+
+    margin-top: -10px;
+    margin-left: -10px;
+    background-color: #FAFAFA;
+    border: none;
+}
+
+
+
+#MessageForm:focus {
+   outline: none;
+   box-shadow: 0 0 1px #FF6602;
+   border-color: #FF6602;
 }
