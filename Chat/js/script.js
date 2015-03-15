@@ -8,6 +8,9 @@ var chatView;
 var messageList = [];
 var globalMesID = 0;
 
+var editMode = false;
+var settingsMode = false;
+
 
 var newMessage = function (userID,mesID,name,mesText){
     return {
@@ -33,29 +36,22 @@ $( document ).ready(function(){
     scrollToBottom(chatView,false);
     chatView.css("opacity","100");
     
+    $("#MessageForm").focus();
     
     
     //NewMessageAdd
     $("#SendBtn").click(userMessageSended);
-    $(document).keypress(function(e) {
-    if(e.which == 13 && !e.shiftKey) {
-        userMessageSended(e);
-        }
-    });
+    registerKeyPress(editMode);
 
-
+//Additional setup
+    $("#EditBtn").click(editMessageEditMode);
+    $("#CancelEditBtn").click(cancelEditMode);
     
-    $('.SettingsButton').on('click', function(){
-            $( "#mainRow" ).transition({ y: '-150px' });
-//  $( "#mainRow" ).animate({
-//      
-//    
-//    marginTop:50px;
-//    
-//  }, 300, function() {
-//    // Animation complete.
-//  });
-	   });
+    
+    $('.SettingsButton').on('click', toggleSettings);
+        
+
+	   
 
 
 });
@@ -144,7 +140,7 @@ function addNewMessage(message){
     messBlock.appendTo(".media-list");
 
     messageList.push(message);
-    //$("#MessageForm").blur();
+    
 
 
 }; 
@@ -153,6 +149,7 @@ function addNewMessage(message){
 
 
 var userMessageSended = function(evt){
+    
     var messageForm = $("#MessageForm");
     var message = newMessage(1,globalMesID++,"Anton",messageForm.val());
     
@@ -160,7 +157,7 @@ var userMessageSended = function(evt){
         return;
     }
     messageForm.val("");
-    $("#MessageForm").blur();
+    
 
     //checkServerStatus();
     
@@ -168,14 +165,24 @@ var userMessageSended = function(evt){
     addNewMessage(message);
     store()
     
-
+    
     scrollToBottom(chatView,true);
-
+    
+    messageFormRefresh();
+    
+    
+    
+    
+   
+    
 
 };
 
 
 var userMessageDelete = function(evt){
+    
+    if (editMode)
+        return;
     
     var sure = confirm("Delete Message?"); // TODO: - Nice alert view. And Animation
     if (!sure) {
@@ -191,10 +198,63 @@ var userMessageDelete = function(evt){
 
 var userMessageEdit = function(evt){
     // - TODO - EDIT
-    alert("Some Awesome View goes Here And we Do some cool stuff by editing a message")
+    
+    if (editMode)
+        return;
+    
+    var messageToEdit = $(this).parents("li.media");
+    messageToEditGlobal = messageToEdit.find(".message");
+    
+    UIToggleEditMode();
+    
 
-};    
+}; 
 
+var messageToEditGlobal;
+
+var editMessageEditMode = function(){
+    if (!editMode)
+        return;
+    var text = $("#MessageForm").val();
+    if (text.length == 0 )
+        return;
+    
+    
+    messageToEditGlobal.text($("#MessageForm").val());
+    cancelEditMode();
+}
+
+var cancelEditMode = function(){
+    if (!editMode)
+        return;
+    UIToggleEditMode();
+}
+
+
+function UIToggleEditMode(){
+    if (editMode){
+        editMode = false;
+        messageFormRefresh();
+        messageToEditGlobal.removeClass("editModeEnabled");
+        $("#SendBtn").show();
+        $("#EditBtn").addClass("hidden");
+        $("#CancelEditBtn").addClass("hidden");
+        registerKeyPress();
+        
+    } else {
+        editMode = true;
+        registerKeyPress(editMode);
+        messageToEditGlobal.addClass("editModeEnabled");
+        var textToEdit = messageToEditGlobal.text();
+        $("#MessageForm").val(textToEdit);
+        $("#MessageForm").focus();
+        $("#SendBtn").hide();
+        $("#EditBtn").removeClass("hidden");
+        $("#CancelEditBtn").removeClass("hidden");
+        
+    }
+    
+}
 
 
 
@@ -246,6 +306,57 @@ function scrollToBottom(view,animate){
   
     }     
 }  
+
+var registerKeyPress = function(editMode){
+    $(document).off("keypress");
+    $(document).keypress(function(e) {
+    if(e.which == 13 && !e.shiftKey) {
+        if (editMode){
+           editMessageEditMode();    
+        } else {
+           userMessageSended(e); 
+        }
+        
+        }
+    });
+}
+
+
+function messageFormRefresh(){
+    $("#MessageForm").val("");
+    $("#MessageForm").blur();
+    setTimeout(function(){
+        $("#MessageForm").focus();
+    }, 50);
+    
+    
+    
+};
+  
+var settingsHeight = "-120px"
+
+var toggleSettings = function(){
+    if (settingsMode){
+        
+        settingsMode = false;
+            $("#SettingsButtonGlyph").removeClass("coloredGlyph");
+        $( "#mainRow" ).transition({ y: '0px' });
+        $('.settings').transition({ opacity: 0});
+        $(".settings").css("box-shadow", "none");
+        
+
+    } else {
+        
+        settingsMode = true;
+        $(".settings").css("box-shadow", "0px 0px 3px #888888"); $("#SettingsButtonGlyph").addClass("coloredGlyph");
+        $( "#mainRow" ).transition({ y: settingsHeight,
+                                   });
+        $('.settings').transition({ opacity: 100 });
+
+
+    }
+
+};  
 
 
 

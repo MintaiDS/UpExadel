@@ -32,11 +32,11 @@
  <main> 
   <div class="container" style="Height:100vh; max-Width:724px;">
   
-    <div class="row" id="mainRow" style="max-Width:724px;"  >
+    <div class="row" id="mainRow" style="max-Width:724px; Height:100vh"  >
 
                 
         
-        <div class="col-md-12 col-sm-12">
+        <div class="col-md-12 col-sm-12" style="height:100vh">
             <div class="panel panel-info">
             
                 <div class="panel-body" style="opacity:0">
@@ -221,7 +221,7 @@ Love’s a game, want to play?</span>
 
                                 <textarea class="form-control" rows="3" id="MessageForm" placeholder="Enter Message ..."  ></textarea>
                                 
-                                <button   class = " btn btn-info btn-sm SettingsButton  pull-left"><span class="glyphicon glyphicon-cog"></span></button>
+                                <button   class = " btn btn-info btn-sm SettingsButton  pull-left"><span id="SettingsButtonGlyph" class="glyphicon glyphicon-cog"></span></button>
 
                             </div>
 
@@ -229,7 +229,9 @@ Love’s a game, want to play?</span>
 
                             <div class="col-md-2 col-sm-2 ">
                             <div>
-                            <button id="SendBtn" type ="submit" align="right" class="btn btn-info  btn-sm custom pull-right"> Speak </button>
+                            <button id="SendBtn" type ="submit" align="right" class="btn btn-info  btn-sm custom pull-right "> Speak </button>
+                            <button id="EditBtn" type ="submit" align="right" class="btn btn-info  btn-sm custom pull-right hidden "> Edit </button>
+                            <button id="CancelEditBtn" type ="submit" align="right" class="btn btn-info  btn-sm   pull-right hidden"> Cancel </button>    
                             </div> 
                                 
                             </div>
@@ -263,9 +265,15 @@ Love’s a game, want to play?</span>
 
 
 </div>
+        
+        
 </div>
     
-     
+     <div class = "row settings ">
+        <div class="col-md-12 col-sm-12">
+        Hello
+        </div>   
+        </div>
 
       
   </div>
