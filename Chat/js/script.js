@@ -114,6 +114,17 @@ function deleteFromList(mesID){
 
 }
 
+function editInList(mesID,newText){
+    for (var i = 0 ; i < messageList.length ; i++){
+        if (messageList[i].mesID == mesID){
+            messageList[i].mesText = newText;
+            store();
+            continue;
+        }
+    }
+
+}
+
 
 // Test Func. It woorks.
 function postMessage(message){ 
@@ -163,7 +174,7 @@ var userMessageSended = function(evt){
     
     //postMessage(message);
     addNewMessage(message);
-    store()
+    store();
     
     
     scrollToBottom(chatView,true);
@@ -190,7 +201,6 @@ var userMessageDelete = function(evt){
     }
     var messageToDelete = $(this).parents("li.media");
     var mesIDtoDelete = parseInt(messageToDelete.attr("data-mesID"));
-    alert(mesIDtoDelete);
     deleteFromList(mesIDtoDelete);
     messageToDelete.remove(); //TODO : - Awesome animation ASAP
 };
@@ -221,6 +231,8 @@ var editMessageEditMode = function(){
     
     
     messageToEditGlobal.text($("#MessageForm").val());
+    var mesIDtoEdit = parseInt(messageToEditGlobal.parents("li.media").attr("data-mesID"));
+    editInList(mesIDtoEdit,messageToEditGlobal.text());
     cancelEditMode();
 }
 
@@ -262,7 +274,7 @@ function UIToggleEditMode(){
 
 
 
-// Does not works. Need to teach server to make callbacks.
+// Does not work. Need to teach server to make callbacks.
 var serverURL = "http://192.168.18.38";
 function checkServerStatus(){ // Rethink
     $.ajax({url: serverURL,
