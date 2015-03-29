@@ -1,0 +1,83 @@
+Web chat has: 
+1. userID // from server
+2. actionID // from server
+***
+Starting values = -1. (In case the chat is started and previous data is not loaded from local storage)
+***
+EveryMessageHas: 
+1. messageID //from server
+***
+Starting value = localMessageID (with its own namespace). (Every message has its own local messageID until it gets the actual one from server. Using this localID, I easely replace it with the real one)
+***
+
+
+
+Logic:
+1. Refresher. (Timeout = 100)
+type: Post
+data: {lastActionInChat: actionID // is it enough? ye? }
+--->
+onSuccess: (JSON data){
+
+JSON data == [newActionID, [ActionsToRefresh]];
+
+ActionToRefresh{
+
+actionType: "add"\"edit"\"delete"
+messageID: int
+userID: int
+userName: String
+message: String // if actionType == "delete" -- this field empty
+
+}
+
+
+}
+
+2. newAction. 
+type: Post
+data: {
+
+ActionToRefresh{
+
+actionType: "add"\"edit"\"delete"
+userID: int
+messageID: int // (if "add", than we have not got the messageID from server yet. Than we send messageIDLocal, which will be replaced with actual messageID, with the respones) 
+userName: String
+message: String // if actionType == "delete" -- this field empty
+
+}
+
+onSuccess: (JSON data){
+
+newActionPostedOnServer{
+messageIDLocal: int (want it back, to know where to refresh messageID)
+messageID: int
+}
+
+
+}
+
+3. getUserID // I suppose this is exclusive case?. I'll make this request first. comparing userID to -1
+type:Post
+data:
+{actionType: getUserID}
+onSuccess{
+//LOAD EVERYTHING
+JSON data == [newUserID, newActionID, [ActionsToRefresh]];
+
+}
+
+
+/// HOW I SEE THE SHIT WORKS
+
+newMessagePosted by user.
+inc actionID in the chat.
+make postRequest to server.
+(Do not need to refresh anything in this chat.)
++ faster. Quick UI. 
+- server is unavailable? -- in this case, i can have a flag with server status, which refreshes with every "Refresher timeInterval method". 
+
+
+
+

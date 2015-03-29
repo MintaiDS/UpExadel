@@ -6,21 +6,53 @@
 
 var chatView;  
 var messageList = [];
-var globalMesID = 0;
+var globalmessageID = 0;
 
 var editMode = false;
 var settingsMode = false;
 
+var actionID = 0;
 
-var newMessage = function (userID,mesID,name,mesText){
+var currentUserName;
+
+var session_id;
+
+
+var newMessage = function (userID,messageID,name,mesText){
     return {
         userID: userID,
-        mesID: mesID,
-        name: name,
-        mesText: mesText
+        userName: name,
+        messageID: messageID,
+        mesText: mesText,
         
     };
 };
+
+
+var newMessageSendRequest = function (session_id,username,room_id, messageText){
+    return {
+        session_id: session_id,
+        message: JSON.stringify( {
+            username : username,
+            room_id: room_id,
+            text: messageText,
+            status: "new",
+            
+            
+            
+        })
+        
+    };
+};
+
+var newGetRequest = function(session_id, action_id, username){
+    return{
+        session_id: session_id,
+        action_id: action_id,
+        username: username,    
+    }
+    
+}
 
 // ----------- Main Function
 
@@ -48,9 +80,13 @@ $( document ).ready(function(){
     $("#CancelEditBtn").click(cancelEditMode);
     
     
+//SettingsListeners    
     $('.SettingsButton').on('click', toggleSettings);
-        
-
+    $("#NameSettingsApply").on('click', applySettings);
+    $("#CancelSettingsBtn").on('click', toggleSettings);
+    
+    
+    alert(currentUserName);
 	   
 
 
@@ -63,6 +99,18 @@ function run() { // start of app. data restore.
     var data = restore() ;
     createAllMessages(data);
     
+    startSession(currentUserName); // post func - get session
+    
+    if(session_id == -1){
+        return; // Error
+    }
+    
+    setInterval(function(){ // Get Requset
+        alert(actionID);    
+       var getRequest = newGetRequest(session_id,actionID,currentUserName)
+       getAction(getRequest); // getNewActions 
+       
+    }, 5000)
 }
 
 
@@ -80,10 +128,27 @@ function restore() {
 	}
     
 	var item = localStorage.getItem("data");
-    var mesIDopt = localStorage.getItem("mesID");
-    if (mesIDopt != null){
-        globalMesID = mesIDopt;
+    var messageIDopt = localStorage.getItem("messageID");
+    if (messageIDopt != null){
+        globalmessageID = messageIDopt;
     }
+    var actionIDopt = localStorage.getItem("actionID");
+    if (actionIDopt != null){
+        actionID = actionIDopt;
+    }
+    
+    var userNameopt = localStorage.getItem("userName");
+    if (userNameopt != null){
+        currentUserName = userNameopt;
+        $("#NameForm").val(currentUserName);
+    } else {
+        
+        currentUserName = "NoNameUser";
+        
+    }
+    
+    
+    
 
 	return item && JSON.parse(item);
 }
@@ -95,7 +160,9 @@ function store(){
 	}
 
 	localStorage.setItem("data", JSON.stringify(messageList));
-    localStorage.setItem("mesID", globalMesID);
+    localStorage.setItem("messageID", globalmessageID);
+    localStorage.setItem("actionID", actionID);
+    localStorage.setItem("userName", currentUserName);
 }
 
 function addMessageFromData(message){
@@ -103,9 +170,9 @@ function addMessageFromData(message){
     
 }
 
-function deleteFromList(mesID){
+function deleteFromList(messageID){
     for (var i = 0 ; i < messageList.length ; i++){
-        if (messageList[i].mesID == mesID){
+        if (messageList[i].messageID == messageID){
             messageList.splice(i,1);
             store();
             continue;
@@ -114,9 +181,9 @@ function deleteFromList(mesID){
 
 }
 
-function editInList(mesID,newText){
+function editInList(messageID,newText){
     for (var i = 0 ; i < messageList.length ; i++){
-        if (messageList[i].mesID == mesID){
+        if (messageList[i].messageID == messageID){
             messageList[i].mesText = newText;
             store();
             continue;
@@ -126,24 +193,110 @@ function editInList(mesID,newText){
 }
 
 
+
 // Test Func. It woorks.
-function postMessage(message){ 
+function postNewMessage(data){ 
+    
+    //alert(JSON.stringify(message1));
+    
     $.ajax({
-    type: "POST",
-    url: "http://10.160.63.123:997/chat",
-    data: JSON.stringify({ name: "John", message: message })
-    }).done(function(ms){
-        alert("done");
+    method: "POST",
+    url: "http://10.160.46.17:8080/ChatServer/UpdateServlet",
+    data: data,    
+    success: function(data){
+        if(data == 0){
+        alert('post message succes');
+    } else {
+        alert('post error in success');
+    }
+    },
+    error: function(data){
+        alert('post error - error');
+    }    
     });
 }
 
+
+function getAction(getRequest){ 
+    
+    //alert(JSON.stringify(message1));
+    
+    $.ajax({
+    method: "GET",
+    url: "http://10.160.46.17:8080/ChatServer/Get",
+    data: getRequest,
+    dataType: JSON,
+    success: function(data){
+        alert("getActionSucces" + data);
+        
+        
+        getActionFromServerWithJSON(data);
+        
+        
+        
+    },
+    error: function(data){
+        alert("getError");
+    }    
+    });
+}
+
+
+function startSession(username){
+    
+    
+    $.ajax({
+		url: "First",
+		method: "POST",
+        async : false, 
+		data: {username: username},
+		success: function(data) {
+			alert("SessionID success" = data);
+            session_id = parseInt(data);
+		},
+		error: function(data) {
+			alert("SessionID error");
+            session_id = -1;
+		}
+})
+    
+    
+}
+
+function getActionFromServerWithJSON(jsonData){
+        if (jsonData.length == 0)
+            return;
+        
+        
+        
+        var dataFromServer = $.parseJSON(jsonData);
+        var newMessages = dataFromServer[messages];
+        
+        for( i = 0; i < newMessages.length; i++){
+            
+            var messageFromServer = newMessages[i];
+            var message = newMessage(messageFromServer.user_id,
+                                    messageFromServer.username,
+                                    messageFromServer.message_id,
+                                    messageFromServer.text);
+            
+            addNewMessage(message);
+            
+        }
+        
+        
+        
+        
+    }
+    
+    
 
 // UI
 function addNewMessage(message){
 
     var messBlock = $(".media-list > .media:first").clone();
     messBlock.find(".message").text(message.mesText);
-    messBlock.attr("data-mesID",[message.mesID]);
+    messBlock.attr("data-messageID",[message.messageID]);
      
     messBlock.removeClass("hidden"); 
     messBlock.find(".deleteMessage").click(userMessageDelete); 
@@ -159,21 +312,39 @@ function addNewMessage(message){
 
 
 
-var userMessageSended = function(evt){
+var userMessageSended = function(){
     
     var messageForm = $("#MessageForm");
-    var message = newMessage(1,globalMesID++,"Anton",messageForm.val());
+    var message = newMessage(1,globalmessageID++,"Anton",messageForm.val());
     
-    if (message.mesText.length == 0){
+    
+    var prepareNewMessageForSend = newMessageSendRequest(session_id,
+                                                        currentUserName,
+                                                        1,
+                                                        messageForm.val());
+                                                      
+                                                      
+                        
+                                  
+//    if (message.mesText.length == 0){
+//        return;
+//    }
+    
+    if(!isMessageValid(message.mesText)){
+        
         return;
     }
+    
     messageForm.val("");
     
 
     //checkServerStatus();
     
-    //postMessage(message);
-    addNewMessage(message);
+   // postAction(action);
+    //addNewMessage(message);
+    
+    postNewMessage(prepareNewMessageForSend);
+    
     store();
     
     
@@ -200,8 +371,8 @@ var userMessageDelete = function(evt){
         return false;
     }
     var messageToDelete = $(this).parents("li.media");
-    var mesIDtoDelete = parseInt(messageToDelete.attr("data-mesID"));
-    deleteFromList(mesIDtoDelete);
+    var messageIDtoDelete = parseInt(messageToDelete.attr("data-messageID"));
+    deleteFromList(messageIDtoDelete);
     messageToDelete.remove(); //TODO : - Awesome animation ASAP
 };
 
@@ -226,13 +397,13 @@ var editMessageEditMode = function(){
     if (!editMode)
         return;
     var text = $("#MessageForm").val();
-    if (text.length == 0 )
+    if (!isMessageValid(text))
         return;
     
     
     messageToEditGlobal.text($("#MessageForm").val());
-    var mesIDtoEdit = parseInt(messageToEditGlobal.parents("li.media").attr("data-mesID"));
-    editInList(mesIDtoEdit,messageToEditGlobal.text());
+    var messageIDtoEdit = parseInt(messageToEditGlobal.parents("li.media").attr("data-messageID"));
+    editInList(messageIDtoEdit,messageToEditGlobal.text());
     cancelEditMode();
 }
 
@@ -275,7 +446,7 @@ function UIToggleEditMode(){
 
 
 // Does not work. Need to teach server to make callbacks.
-var serverURL = "http://192.168.18.38";
+var serverURL = "";
 function checkServerStatus(){ // Rethink
     $.ajax({url: serverURL,
         type: "HEAD",
@@ -319,18 +490,54 @@ function scrollToBottom(view,animate){
     }     
 }  
 
+
+
+
 var registerKeyPress = function(editMode){
     $(document).off("keypress");
+    
     $(document).keypress(function(e) {
     if(e.which == 13 && !e.shiftKey) {
         if (editMode){
            editMessageEditMode();    
         } else {
-           userMessageSended(e); 
+           userMessageSended(); 
         }
         
         }
+        
+        
+        
+        
+        
     });
+}
+
+var registerForNameCheck = function(){
+    if(settingsMode){
+    $(document).keyup(function(e){
+            
+    var Newname = $("#NameForm").val();
+    if(isMessageValid(Newname)){
+        
+        $("#NameSettingsApply").removeClass("disabled");
+        
+    } else {
+        
+        $("#NameSettingsApply").addClass("disabled");
+        
+    }
+        
+            
+            
+        
+      
+    })
+    } else {
+        
+       $(document).off("keyup"); 
+        
+    }
 }
 
 
@@ -351,24 +558,56 @@ var toggleSettings = function(){
     if (settingsMode){
         
         settingsMode = false;
-            $("#SettingsButtonGlyph").removeClass("coloredGlyph");
+         $(".settings").css("z-index", "-1");   $("#SettingsButtonGlyph").removeClass("coloredGlyph");
         $( "#mainRow" ).transition({ y: '0px' });
         $('.settings').transition({ opacity: 0});
         $(".settings").css("box-shadow", "none");
-        
+        $(".settings").css("z-index", "-1");
 
     } else {
         
         settingsMode = true;
-        $(".settings").css("box-shadow", "0px 0px 3px #888888"); $("#SettingsButtonGlyph").addClass("coloredGlyph");
+        $(".settings").css("bottom","120px");
+        $(".settings").css("box-shadow", "0px 2px 3px #888888"); $("#SettingsButtonGlyph").addClass("coloredGlyph");
         $( "#mainRow" ).transition({ y: settingsHeight,
                                    });
-        $('.settings').transition({ opacity: 100 });
+        
+        $('.settings').transition({ opacity: 100 }, function(){
+            $(".settings").css("z-index", "0");
+            
+        });
 
 
     }
+    
+    registerForNameCheck();
 
-};  
+}; 
+
+
+var applySettings = function(){
+    
+    var newName = $("#NameForm").val();
+    currentUserName = newName;
+    store();
+    
+    toggleSettings();
+}
+
+    var isMessageValid = function(messageText){
+        
+        
+        if (messageText.length == 0 )
+            return false;
+        
+        for (var i = 0, ch; i < messageText.length; i++ ){
+            ch = messageText.charCodeAt(i);
+            if(ch != 32 && ch != 10){
+            return true;
+            }
+        }
+        return false;
+    }
 
 
 

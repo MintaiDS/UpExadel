@@ -51,6 +51,29 @@ btn-info.active.custom,
 
      }
 
+
+btn-info.active.customSettingsApply,
+ .btn-info.focus.customSettingsApply,
+  .btn-info:active.customSettingsApply,
+   .btn-info:focus.customSettingsApply,
+    .btn-info:hover.customSettingsApply,
+     .open .dropdown-toggle.btn-info.customSettingsApply {
+
+     	color: #363636;
+     	background-color: #FAFAFA;
+     	border-color: #FAFAFA;
+         outline: none;
+
+     }
+
+
+.customSettingsApply {
+        color: #363636;
+     	background-color: #FAFAFA;
+     	border-color: #FAFAFA;
+         outline: none;
+}
+
 btn-info.active,
  .btn-info.focus,
   .btn-info:active,
@@ -60,7 +83,7 @@ btn-info.active,
         .SettingsButton
         {
 
-     	color: #EBEBEB !important;
+     	
      	background-color: #FAFAFA;
      	border-color: #FAFAFA;
         box-shadow: none;
@@ -213,6 +236,8 @@ div.line{
     margin-right: 0px;
     }
     
+    
+    
 }
 
 @media(max-width:768px) { 
@@ -224,11 +249,23 @@ div.line{
     
 }
     
+#CancelSettingsBtn {  
+    color: #363636;
+    background-color: white;
+    outline: none;
+    
+}  
+
 #CancelEditBtn {  
     background-color: #FF6602;
     outline: none;
     
-}    
+} 
+
+#CancelSettingsBtn {
+    margin-top: 6px;
+    margin-right: 0px;
+    }
 
 
 
@@ -250,12 +287,50 @@ div.line{
     background-color: #363636;
     
     border-top: 2px solid #FF6602;
+    
 }
 
-.container {
-    clip: 
-}
+
 
 .coloredGlyph {
     color:#FF6602 !important;
+}
+
+.NameChangeForm {
+    margin-left: 15px;
+    margin-top: 20px;
+}
+
+#NameForm {
+
+    box-shadow: none;
+    height: 30px;
+    line-height: 30px;
+    background-color: #363636;
+    border: 1px solid aliceblue;
+    color:aliceblue;
+}
+
+.NameChangeFormRow {
+    margin-top: 15px;
+}
+
+.img-nameForm {
+
+
+}
+
+.settingsButtonBlock {
+    padding-right: 30px;
+}
+
+
+
+
+
+.btn-info.disabled,
+.btn-info:disabled,
+.btn-info[disabled] {
+  background-color: darkgray;
+  background-image: none;
 }
