@@ -1,0 +1,104 @@
+GET http://localhost:999/chat?token=TN11EN HTTP/1.1
+Host: localhost:999
+Connection: keep-alive
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 YaBrowser/15.2.2214.3645 Safari/537.36
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: ru,en;q=0.8
+
+
+HTTP/1.1 200 OK
+Date: Sun, 29 Mar 2015 16:38:06 GMT
+Content-length: 227
+
+{"messages":[{"name":"User 1653","id":"1","text":"Hi!"},{"name":"User 1523","id":"2","text":"What's up?"},{"name":"User 1653","id":"3","text":"I'm fine and you?"},{"name":"User 1523","id":"4","text":"Me too"}],"token":"TN43EN"}
+
+------------------------------------------------------------------
+
+PUT http://localhost:999/chat HTTP/1.1
+User-Agent: Composer
+Host: localhost:999
+Content-Length: 53
+
+{"id":"2","name":"User 1523","text":"Hi! What's up?"}
+HTTP/1.1 200 OK
+Date: Sun, 29 Mar 2015 16:40:33 GMT
+Transfer-encoding: chunked
+
+0
+
+
+
+------------------------------------------------------------------
+
+GET http://localhost:999/chat?token=TN11EN HTTP/1.1
+Host: localhost:999
+Connection: keep-alive
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 YaBrowser/15.2.2214.3645 Safari/537.36
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: ru,en;q=0.8
+
+
+HTTP/1.1 200 OK
+Date: Sun, 29 Mar 2015 16:40:47 GMT
+Content-length: 231
+
+{"messages":[{"name":"User 1653","id":"1","text":"Hi!"},{"name":"User 1523","id":"2","text":"Hi! What's up?"},{"name":"User 1653","id":"3","text":"I'm fine and you?"},{"name":"User 1523","id":"4","text":"Me too"}],"token":"TN43EN"}
+
+------------------------------------------------------------------
+
+DELETE http://localhost:999/chat HTTP/1.1
+User-Agent: Composer
+Host: localhost:999
+Content-Length: 10
+
+{"id":"4"}
+HTTP/1.1 200 OK
+Date: Sun, 29 Mar 2015 16:41:31 GMT
+Transfer-encoding: chunked
+
+0
+
+
+
+------------------------------------------------------------------
+
+GET http://localhost:999/chat?token=TN11EN HTTP/1.1
+Host: localhost:999
+Connection: keep-alive
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 YaBrowser/15.2.2214.3645 Safari/537.36
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: ru,en;q=0.8
+
+
+HTTP/1.1 200 OK
+Date: Sun, 29 Mar 2015 16:41:37 GMT
+Content-length: 225
+
+{"messages":[{"name":"User 1653","id":"1","text":"Hi!"},{"name":"User 1523","id":"2","text":"Hi! What's up?"},{"name":"User 1653","id":"3","text":"I'm fine and you?"},{"name":"User 1523","id":"4","text":""}],"token":"TN43EN"}
+
+------------------------------------------------------------------
+
+GET http://localhost:999/chat?token=TN11EN HTTP/1.1
+Host: localhost:999
+Connection: keep-alive
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 YaBrowser/15.2.2214.3645 Safari/537.36
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: ru,en;q=0.8
+
+
+HTTP/1.1 200 OK
+Date: Sun, 29 Mar 2015 16:42:41 GMT
+Content-length: 284
+
+{"messages":[{"name":"User 1653","id":"1","text":"Hi!"},{"name":"User 1523","id":"2","text":"Hi! What's up?"},{"name":"User 1653","id":"3","text":"I'm fine and you?"},{"name":"User 1523","id":"4","text":""},{"name":"User 1523","id":"5","text":"Fine too, cockatoo!"}],"token":"TN51EN"}
+
+------------------------------------------------------------------
+
