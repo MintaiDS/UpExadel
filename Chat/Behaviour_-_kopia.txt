@@ -1,0 +1,186 @@
+1. Сначала на FirstServlet посылается запрос POST с username
+
+$.ajax({
+		url: "First",
+		method: "POST",
+		data: {username: "Anton Dosov"},
+		dataType: "html",
+		success: function(data) {
+			alert("Everything is awesome!");
+		},
+		error: function(data) {
+			alert("Some error 1");
+		}
+})
+	
+С сервера приходит session_id и это значение надо сохранить куда-нибудь.
+Например, в переменую session_id.
+
+
+
+
+2. Когда пользователь делает какое-то действие.
+2.1. Для добавления сообщения нужно послать структуру сервлету UpdateServlet.
+
+msg = {
+		username: $("#username").val(),
+		room_id: $("#room_id").val(),
+		text: $("#text").val(),
+		status: 'new',
+	}
+
+to_send = {
+	session_id: session_id,
+	message: JSON.stringify(msg)
+}
+
+$.ajax({
+	url: "Update",
+	method: "POST",
+	data: to_send,
+	dataType: "html",
+	success: function(data) {
+		if (data == 0) {
+			alert("Life's good");
+		}
+		else {
+			alert("something goes wrong");
+		}
+	},
+	error: function(data) {
+		alert("Some error 2");
+	}
+})
+
+Так как пока комнат (конференций, бесед) нет, то в поле room_id нужно передавать 1.
+Скоре всего на сервере с комнатами все уже будет работать нормально.
+А пока у нас есть только одна комната, надо передавать в roomd_id единицу.
+
+В ответ сервлет UpdateServlet вернет код ошибки (если 0, то ошибок нет).
+
+2.2. Для редактирования нужно послать структуру сервлету UpdateServlet.
+
+msg = {
+		text: $("#text").val(),
+		status: 'edit',
+		message_id: $("#message_id").val()
+	}
+session_id = 10;
+to_send = {
+	session_id: session_id,
+	message: JSON.stringify(msg)
+}
+$.ajax({
+	url: "Update",
+	method: "POST",
+	data: to_send,
+	dataType: "html",
+	success: function(data) {
+		if (data == 0) {
+			alert("Life's good");
+		}
+		else {
+			alert("something goes wrong");
+		}
+		getMessages(data);
+	},
+	error: function(data) {
+		alert("Some error 2");
+	}
+})
+
+Возможно, возник вопрос, где взять message_id.
+message_id будет получаться далее вместе со всеми сообщениями.
+
+В ответ сервлет UpdateServlet вернет код ошибки (если 0, то ошибок нет).
+
+2.3. Для удаления нужно послать структуру сервлету UpdateServlet.
+
+msg = {
+		status: 'delete',
+		message_id: $("#message_id").val()
+	}
+session_id = 10;
+to_send = {
+	session_id: session_id,
+	message: JSON.stringify(msg)
+}
+//console.log(msg)
+$.ajax({
+	url: "Update",
+	method: "POST",
+	data: to_send,
+	dataType: "html",
+	success: function(data) {
+		if (data == 0) {
+			alert("Life's good");
+		}
+		else {
+			alert("something goes wrong");
+		}
+		getMessages(data);
+	},
+	error: function(data) {
+		alert("Some error 2");
+	}
+})
+
+В ответ сервлет UpdateServlet вернет код ошибки (если 0, то ошибок нет).
+
+3. Получение сообщений.
+
+Для получения еще не полученных сообщений нужно отправить на GetServlet структуру.
+
+to_send = {
+	session_id: session_id,
+	action_id: last_action_id,
+	username: $("#username").val()
+}
+
+$.ajax({
+	url: "Get",
+	method: "GET",
+	data: to_send,
+	dataType: "html",
+	success: function(data) {
+		$("#action_id").val("");
+		getMessages(data);
+	},
+	error: function(data) {
+		alert("Some error 3");
+	}
+})
+
+Вернется или какое-то отрицательное число, если произошла ошибка,
+или json с сообщениями.
+
+Выглядит эта структура как-то так:
+{"messages":[{"action_id":15,"time":"time","text":"Some short message","username":"Anton Dosov","status":2,"room_id":1,"message_id":1},{"action_id":2,"time":"23:56","text":"Thank you, guys!","username":"Taylor Swift","status":1,"room_id":1,"message_id":2},{"action_id":14,"time":"time","text":"","username":"Nick","status":3,"room_id":1,"message_id":3},{"action_id":12,"time":"time","text":"","username":"Max","status":3,"room_id":1,"message_id":4},{"action_id":11,"time":"time","text":"edited text 2","username":"Max","status":2,"room_id":1,"message_id":5},{"action_id":6,"time":"time","text":"some text from Max","username":"Max","status":1,"room_id":1,"message_id":6},{"action_id":17,"time":"time","text":"Some text from Jessica","username":"Jessica","status":1,"room_id":1,"message_id":10},{"action_id":18,"time":"time","text":"Max 1","username":"Max","status":1,"room_id":1,"message_id":11},{"action_id":20,"time":"time","text":"edited message 2","username":"Max","status":2,"room_id":1,"message_id":12},{"action_id":21,"time":"time","text":"as;lkdfja;lksdjf;lkasjdf;","username":"Nick","status":1,"room_id":1,"message_id":13},{"action_id":31,"time":"time","text":"","username":"Max","status":3,"room_id":1,"message_id":14},{"action_id":23,"time":"time","text":"a;lksdjf","username":"Max","status":1,"room_id":1,"message_id":15},{"action_id":30,"time":"time","text":"16 edited message","username":"Max","status":2,"room_id":1,"message_id":16},{"action_id":28,"time":"time","text":"","username":"Max","status":3,"room_id":1,"message_id":17},{"action_id":26,"time":"time","text":"asdflkj;lasfd","username":"Harry","status":1,"room_id":1,"message_id":18},{"action_id":29,"time":"time","text":"Some quot from Harry","username":"Harry","status":1,"room_id":1,"message_id":19}]}
+
+Стоит обратить внимание, что status здесь являеся числом, а не строкой. 
+Новое, еще не менявшееся сообщение - 1, редактированное сообщение - 2, 
+удаленное сообщение - 3.
+Время пока не выставляется. Просто пишется строка "time".
+
+Что еще не мешало бы сделать:
+- Логирование.
+	Пока у меня что-то выводится, но бессисемно.
+- Генерировать время, когда добавляется сообщение.
+	Пока у меня там просто пишется слово "time".
+- Доработать обработку ошибок.
+- Вообще сделать код читаемым, написать комментариев.
+- Подумать про одинарные кавычки.
+
+То, что было выше, в основном относится к серверной части.
+
+- Регистрация пользователей и изменение их данных (имени, например).
+	Пока только ручная.
+- Авторизация.
+	Добавить пароли.
+	Хранить хеши паролей.
+	Каким-то образом использовать session_id.
+- Несколько комнат (конференций, бесед).
+- Аватарки.
+- Смайлики.
+
+Больше ничего в голову пока не пришло.
