@@ -1,0 +1,33 @@
+GET http://localhost:8888/chat?token=TN11EN HTTP/1.1
+Host: localhost:8888
+Proxy-Connection: keep-alive
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 YaBrowser/15.2.2214.3645 Safari/537.36
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: ru,en;q=0.8
+
+
+HTTP/1.1 200 OK
+Date: Sat, 28 Mar 2015 16:30:47 GMT
+Content-length: 133
+
+{"messages":["Hi","I want to tell you a story","But I am too lazy","Besides it is enough messages already.","Bye."],"token":"TN11EN"}
+
+------------------------------------------------------------------
+
+GET http://localhost:8888/chat?token=TN11EN HTTP/1.1
+User-Agent: Java/1.8.0_31
+Host: localhost:8888
+Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2
+Connection: keep-alive
+
+
+HTTP/1.1 200 OK
+Date: Sat, 28 Mar 2015 16:30:47 GMT
+Content-length: 133
+
+{"messages":["Hi","I want to tell you a story","But I am too lazy","Besides it is enough messages already.","Bye."],"token":"TN11EN"}
+
+------------------------------------------------------------------
+
