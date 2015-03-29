@@ -29,12 +29,12 @@ var newMessage = function (userID,messageID,name,mesText){
 };
 
 
-var newMessageSendRequest = function (session_id,username,room_id, messageText){
+var newMessageSendRequest = function (session_id, username,room_id, messageText){
     return {
         session_id: session_id,
         message: JSON.stringify( {
             username : username,
-            room_id: room_id,
+            room_id: String(room_id),
             text: messageText,
             status: "new",
             
@@ -86,7 +86,7 @@ $( document ).ready(function(){
     $("#CancelSettingsBtn").on('click', toggleSettings);
     
     
-    alert(currentUserName);
+    //alert(currentUserName);
 	   
 
 
@@ -101,12 +101,14 @@ function run() { // start of app. data restore.
     
     startSession(currentUserName); // post func - get session
     
+
+	
     if(session_id == -1){
         return; // Error
     }
     
     setInterval(function(){ // Get Requset
-        alert(actionID);    
+		//alert(actionID);    
        var getRequest = newGetRequest(session_id,actionID,currentUserName)
        getAction(getRequest); // getNewActions 
        
@@ -201,7 +203,8 @@ function postNewMessage(data){
     
     $.ajax({
     method: "POST",
-    url: "http://10.160.46.17:8080/ChatServer/UpdateServlet",
+    //url: "http://10.160.46.17:8080/ChatServer/UpdateServlet",
+	url: "Update",
     data: data,    
     success: function(data){
         if(data == 0){
@@ -223,20 +226,19 @@ function getAction(getRequest){
     
     $.ajax({
     method: "GET",
-    url: "http://10.160.46.17:8080/ChatServer/Get",
+    //url: "http://10.160.46.17:8080/ChatServer/Get",
+	url: "Get",
     data: getRequest,
-    dataType: JSON,
+    dataType: "html",
     success: function(data){
-        alert("getActionSucces" + data);
+        //alert("getActionSucces" + data);
         
         
         getActionFromServerWithJSON(data);
         
-        
-        
     },
     error: function(data){
-        alert("getError");
+        alert("getAction: getError");
     }    
     });
 }
@@ -251,7 +253,7 @@ function startSession(username){
         async : false, 
 		data: {username: username},
 		success: function(data) {
-			alert("SessionID success" = data);
+			//alert("SessionID success" == data);
             session_id = parseInt(data);
 		},
 		error: function(data) {
@@ -270,8 +272,8 @@ function getActionFromServerWithJSON(jsonData){
         
         
         var dataFromServer = $.parseJSON(jsonData);
-        var newMessages = dataFromServer[messages];
-        
+        var newMessages = dataFromServer["messages"];
+		
         for( i = 0; i < newMessages.length; i++){
             
             var messageFromServer = newMessages[i];
@@ -279,6 +281,9 @@ function getActionFromServerWithJSON(jsonData){
                                     messageFromServer.username,
                                     messageFromServer.message_id,
                                     messageFromServer.text);
+
+			new_action_id = parseInt(messageFromServer.action_id);
+			actionID = Math.max(actionID, new_action_id);
             
             addNewMessage(message);
             
@@ -305,8 +310,7 @@ function addNewMessage(message){
 
     messageList.push(message);
     
-
-
+	scrollToBottom(chatView,false);
 }; 
 
 
