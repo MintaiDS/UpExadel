@@ -17,18 +17,18 @@ var currentUserName;
 
 var session_id;
 
-
-var newMessage = function (userID,messageID,name,mesText){
+// Struct for adding message to UI
+var newMessage = function (time,userName,messageID,messageText){
     return {
-        userID: userID,
-        userName: name,
+        time: time,
+        userName: userName,
         messageID: messageID,
-        mesText: mesText,
+        messageText: messageText,
         
     };
 };
 
-
+// Struct for sending message to server
 var newMessageSendRequest = function (session_id, username,room_id, messageText){
     return {
         session_id: session_id,
@@ -38,13 +38,37 @@ var newMessageSendRequest = function (session_id, username,room_id, messageText)
             text: messageText,
             status: "new",
             
-            
-            
+        })
+        
+    };
+};
+// Struct for deleting message from server
+var deleteMessageRequest = function (session_id, message_id){
+    return {
+        session_id: session_id,
+        message: JSON.stringify( {
+            message_id: String(message_id),
+            status: "delete",
         })
         
     };
 };
 
+var editMessageRequest = function (session_id, message_id, newMessage){
+    return {
+        session_id: session_id,
+        message: JSON.stringify( {
+            message: newMessage,
+            message_id: String(message_id),
+            status: "edit",
+        })
+        
+    };
+};
+
+
+
+// Struct for geting message from server
 var newGetRequest = function(session_id, action_id, username){
     return{
         session_id: session_id,
@@ -101,8 +125,6 @@ function run() { // start of app. data restore.
     
     startSession(currentUserName); // post func - get session
     
-
-	
     if(session_id == -1){
         return; // Error
     }
@@ -145,7 +167,7 @@ function restore() {
         $("#NameForm").val(currentUserName);
     } else {
         
-        currentUserName = "NoNameUser";
+        currentUserName = "GuestUser";
         
     }
     
@@ -186,7 +208,7 @@ function deleteFromList(messageID){
 function editInList(messageID,newText){
     for (var i = 0 ; i < messageList.length ; i++){
         if (messageList[i].messageID == messageID){
-            messageList[i].mesText = newText;
+            messageList[i].messageText = newText;
             store();
             continue;
         }
@@ -203,8 +225,8 @@ function postNewMessage(data){
     
     $.ajax({
     method: "POST",
-    //url: "http://10.160.46.17:8080/ChatServer/UpdateServlet",
-	url: "Update",
+    url: "http://10.160.6.234:8080/Chat/Update",
+	//url: "Update",
     data: data,    
     success: function(data){
         if(data == 0){
@@ -219,6 +241,51 @@ function postNewMessage(data){
     });
 }
 
+function postDeleteMessage(data){ 
+    
+    //alert(JSON.stringify(message1));
+    
+    $.ajax({
+    method: "POST",
+    url: "http://10.160.6.234:8080/Chat/Update",
+	//url: "Update",
+    data: data,    
+    success: function(data){
+        if(data == 0){
+        alert('del message succes');
+    } else {
+        alert('del error in success');
+    }
+    },
+    error: function(data){
+        alert('del error - error');
+    }    
+    });
+}
+
+
+function postEditMessage(data){ 
+    
+    //alert(JSON.stringify(message1));
+    
+    $.ajax({
+    method: "POST",
+    url: "http://10.160.6.234:8080/Chat/Update",
+	//url: "Update",
+    data: data,    
+    success: function(data){
+        if(data == 0){
+        alert('edit message succes');
+    } else {
+        alert('edit error in success');
+    }
+    },
+    error: function(data){
+        alert('edit error - error');
+    }    
+    });
+}
+
 
 function getAction(getRequest){ 
     
@@ -226,8 +293,8 @@ function getAction(getRequest){
     
     $.ajax({
     method: "GET",
-    //url: "http://10.160.46.17:8080/ChatServer/Get",
-	url: "Get",
+    url: "http://10.160.6.234:8080/Chat/Get",
+	//url: "Get",
     data: getRequest,
     dataType: "html",
     success: function(data){
@@ -248,7 +315,8 @@ function startSession(username){
     
     
     $.ajax({
-		url: "First",
+        url: "http://10.160.6.234:8080/Chat/First",
+		//url: "First",
 		method: "POST",
         async : false, 
 		data: {username: username},
@@ -277,15 +345,46 @@ function getActionFromServerWithJSON(jsonData){
         for( i = 0; i < newMessages.length; i++){
             
             var messageFromServer = newMessages[i];
-            var message = newMessage(messageFromServer.user_id,
-                                    messageFromServer.username,
-                                    messageFromServer.message_id,
-                                    messageFromServer.text);
-
-			new_action_id = parseInt(messageFromServer.action_id);
-			actionID = Math.max(actionID, new_action_id);
             
-            addNewMessage(message);
+            newActionId = parseInt(messageFromServer.action_id);
+			actionID = Math.max(actionID, newActionId);
+            
+            
+            var status = messageFromServer.status;
+            alert(status);
+            if(status == 1){ // NEW
+            
+                
+                var message = newMessage(messageFromServer.time,
+                                        messageFromServer.username,
+                                        messageFromServer.message_id,
+                                        messageFromServer.text);
+
+
+
+
+                addNewMessage(message);
+                
+                
+                
+                
+                } else if (status == 3) { // DELETE
+                    var messageIDToDelete = messageFromServer.message_id;
+                    
+                    deleteMessageByID(messageIDToDelete);
+                    
+                } else if(status == 2){// EDIT 
+                    var messageIDToEdit = messageFromServer.message_id;
+                    var editMessageText = messageFromServer.text;
+                    
+                    editMessageByIDandNewText(messageIDToEdit,editMessageText);
+                    
+                    
+                }
+            
+            
+            
+            
             
         }
         
@@ -300,15 +399,28 @@ function getActionFromServerWithJSON(jsonData){
 function addNewMessage(message){
 
     var messBlock = $(".media-list > .media:first").clone();
-    messBlock.find(".message").text(message.mesText);
+    messBlock.find(".message").text(message.messageText);
+    messBlock.find(".NickName").text(message.userName);
+    messBlock.find(".Time").text(message.time);
     messBlock.attr("data-messageID",[message.messageID]);
      
     messBlock.removeClass("hidden"); 
+    
+    if(currentUserName == message.userName){ // SameUser 
     messBlock.find(".deleteMessage").click(userMessageDelete); 
     messBlock.find(".editMessage").click(userMessageEdit);
+    } else { // Can't delete and edit this message
+        
+    messBlock.find(".deleteMessage").remove(); 
+    messBlock.find(".editMessage").remove();
+        
+    }
+    
+    
     messBlock.appendTo(".media-list");
 
     messageList.push(message);
+    store();
     
 	scrollToBottom(chatView,false);
 }; 
@@ -316,10 +428,10 @@ function addNewMessage(message){
 
 
 
-var userMessageSended = function(){
+var userMessageSended = function(){ // new message sended by user
     
     var messageForm = $("#MessageForm");
-    var message = newMessage(1,globalmessageID++,"Anton",messageForm.val());
+    
     
     
     var prepareNewMessageForSend = newMessageSendRequest(session_id,
@@ -330,11 +442,11 @@ var userMessageSended = function(){
                                                       
                         
                                   
-//    if (message.mesText.length == 0){
+//    if (message.messageText.length == 0){
 //        return;
 //    }
     
-    if(!isMessageValid(message.mesText)){
+    if(!isMessageValid(prepareNewMessageForSend.message)){
         
         return;
     }
@@ -349,7 +461,7 @@ var userMessageSended = function(){
     
     postNewMessage(prepareNewMessageForSend);
     
-    store();
+    //store();
     
     
     scrollToBottom(chatView,true);
@@ -364,6 +476,26 @@ var userMessageSended = function(){
 
 };
 
+function deleteMessageByID(messageID){
+
+    var messBlock = $(".media-list > .media[data-messageID="+messageID+"]");
+    alert(messBlock.text());
+    messBlock.remove();
+    deleteFromList(messageID);
+    store();
+    
+}
+
+function editMessageByIDandNewText(messageID, messageText){
+    alert("new text = " + messageText);
+    var messBlock = $(".media-list > .media[data-messageID="+messageID+"]");
+    var textUI = messBlock.find(".message");
+    textUI.text(messageText);
+    
+    
+    editInList(messageIDtoEdit,messageToEditGlobal.text());
+    store();
+}
 
 var userMessageDelete = function(evt){
     
@@ -374,15 +506,20 @@ var userMessageDelete = function(evt){
     if (!sure) {
         return false;
     }
+    
     var messageToDelete = $(this).parents("li.media");
     var messageIDtoDelete = parseInt(messageToDelete.attr("data-messageID"));
-    deleteFromList(messageIDtoDelete);
-    messageToDelete.remove(); //TODO : - Awesome animation ASAP
+    //deleteFromList(messageIDtoDelete);
+    //messageToDelete.remove(); //TODO : - Awesome animation ASAP
+    alert('delete ' + messageIDtoDelete);
+    
+    var messageToDeleteRequestData = deleteMessageRequest(session_id,messageIDtoDelete);
+    postDeleteMessage(messageToDeleteRequestData);
+    
 };
 
 
-var userMessageEdit = function(evt){
-    // - TODO - EDIT
+var userMessageEdit = function(evt){ // ENTER EDIT MODE
     
     if (editMode)
         return;
@@ -397,17 +534,26 @@ var userMessageEdit = function(evt){
 
 var messageToEditGlobal;
 
-var editMessageEditMode = function(){
+var editMessageEditMode = function(){ // EDIT MESSAGE 
     if (!editMode)
         return;
+    
     var text = $("#MessageForm").val();
     if (!isMessageValid(text))
         return;
     
+   
     
-    messageToEditGlobal.text($("#MessageForm").val());
+    
+    messageToEditGlobal.text("Editing...");
     var messageIDtoEdit = parseInt(messageToEditGlobal.parents("li.media").attr("data-messageID"));
-    editInList(messageIDtoEdit,messageToEditGlobal.text());
+    
+    var editRequest = editMessageRequest(session_id, messageIDtoEdit, text);
+    postEditMessage(editRequest);
+    
+    
+    
+    
     cancelEditMode();
 }
 
