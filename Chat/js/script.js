@@ -58,7 +58,7 @@ var editMessageRequest = function (session_id, message_id, newMessage){
     return {
         session_id: session_id,
         message: JSON.stringify( {
-            message: newMessage,
+            text: newMessage,
             message_id: String(message_id),
             status: "edit",
         })
@@ -225,8 +225,8 @@ function postNewMessage(data){
     
     $.ajax({
     method: "POST",
-    url: "http://10.160.6.234:8080/Chat/Update",
-	//url: "Update",
+    //url: "http://10.160.6.234:8080/Chat/Update",
+	url: "Update",
     data: data,    
     success: function(data){
         if(data == 0){
@@ -247,8 +247,8 @@ function postDeleteMessage(data){
     
     $.ajax({
     method: "POST",
-    url: "http://10.160.6.234:8080/Chat/Update",
-	//url: "Update",
+    //url: "http://10.160.6.234:8080/Chat/Update",
+	url: "Update",
     data: data,    
     success: function(data){
         if(data == 0){
@@ -270,8 +270,8 @@ function postEditMessage(data){
     
     $.ajax({
     method: "POST",
-    url: "http://10.160.6.234:8080/Chat/Update",
-	//url: "Update",
+    //url: "http://10.160.6.234:8080/Chat/Update",
+	url: "Update",
     data: data,    
     success: function(data){
         if(data == 0){
@@ -293,8 +293,8 @@ function getAction(getRequest){
     
     $.ajax({
     method: "GET",
-    url: "http://10.160.6.234:8080/Chat/Get",
-	//url: "Get",
+    //url: "http://10.160.6.234:8080/Chat/Get",
+	url: "Get",
     data: getRequest,
     dataType: "html",
     success: function(data){
@@ -315,8 +315,8 @@ function startSession(username){
     
     
     $.ajax({
-        url: "http://10.160.6.234:8080/Chat/First",
-		//url: "First",
+        //url: "http://10.160.6.234:8080/Chat/First",
+		url: "First",
 		method: "POST",
         async : false, 
 		data: {username: username},
@@ -351,7 +351,7 @@ function getActionFromServerWithJSON(jsonData){
             
             
             var status = messageFromServer.status;
-            alert(status);
+            //alert(status);
             if(status == 1){ // NEW
             
                 
@@ -479,7 +479,7 @@ var userMessageSended = function(){ // new message sended by user
 function deleteMessageByID(messageID){
 
     var messBlock = $(".media-list > .media[data-messageID="+messageID+"]");
-    alert(messBlock.text());
+    //alert(messBlock.text());
     messBlock.remove();
     deleteFromList(messageID);
     store();
@@ -487,7 +487,7 @@ function deleteMessageByID(messageID){
 }
 
 function editMessageByIDandNewText(messageID, messageText){
-    alert("new text = " + messageText);
+    //alert("new text = " + messageText);
     var messBlock = $(".media-list > .media[data-messageID="+messageID+"]");
     var textUI = messBlock.find(".message");
     textUI.text(messageText);
