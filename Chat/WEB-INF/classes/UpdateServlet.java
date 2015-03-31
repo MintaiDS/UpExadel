@@ -119,9 +119,9 @@ public class UpdateServlet extends HttpServlet {
 		
 		String username = (String)obj.get("username");
 		String room_id = (String)obj.get("room_id");
-		String text = (String)obj.get("text");
+		String text = CommonFunctions.fixSqlFieldValue((String)obj.get("text"));
 		String status = (String)obj.get("status");
-		String time = "time";
+		String time = CommonFunctions.nowTime();
 		
 		
 		//err.println(myName + ": " + username + " " + room_id + 

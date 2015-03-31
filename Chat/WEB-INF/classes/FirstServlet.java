@@ -21,7 +21,8 @@ public class FirstServlet extends HttpServlet {
     static Connection connection;
     
     public void init(ServletConfig config) {
-        err.println(myName + ": init");
+		String now = CommonFunctions.nowTime();
+        err.println(now + " " + myName + ": init");
         
         String username = config.getInitParameter("username");
         String password = config.getInitParameter("password");
