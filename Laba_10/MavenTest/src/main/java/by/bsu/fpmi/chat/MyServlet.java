@@ -21,76 +21,113 @@ public class MyServlet extends HttpServlet {
     public void init() throws ServletException {
         try {
             loadHistory();
-            System.out.println("some2");
         } catch (SAXException | IOException | ParserConfigurationException | TransformerException e) {
            System.err.println(e);
         }
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String index = request.getParameter("action_id");
-        System.out.println("some1");
-        String messages;
-        response.setContentType("text/html");
-        response.setCharacterEncoding("UTF-8");
-        if (index != null) {
-            messages = formResponse(Integer.valueOf(index));
-
-        }
-        else
+        //try{
+            //response.setStatus(500);
+            //getServletContext().getRequestDispatcher("/500Error.jsp").forward(request, response);
+            String index = request.getParameter("actionId");
+        if (Integer.valueOf(index) > MessageStorage.getStorage().size())
         {
-            messages = formResponse(0);
+            response.setContentType("text/html");
+            response.setStatus(500);
+            getServletContext().getRequestDispatcher("/500Error.jsp").forward(request, response);
+        }else {
+            String messages;
+            if (index != null) {
+                messages = formResponse(Integer.valueOf(index));
+            } else {
+                messages = formResponse(0);
+            }
+            response.setContentType("application/json");
+            PrintWriter out = response.getWriter();
+            out.print(messages);
+            out.flush();
+       /* catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
+            System.out.println(e);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }*/
+            //System.out.println(messages);
         }
-        response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        out.print(messages);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("some");
+        //System.out.println("some");
         String data = Functions.getMessageBody(request);
         try {
+            //System.out.println(data);
             JSONObject json = Functions.stringToJson(data);
+           // System.out.println("how");
             Message m = Functions.jsonToMessage(json);
-            System.out.println(m.toString());
-            MessageStorage.addMessage(m);
+           // System.out.println(m.toString());
+           // System.out.println("how2");
+            //MessageStorage.addMessage(m);
             MessageStorage.addMessageH(m);
             XMLStorage.addData(m);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("text/html");
+            response.setStatus(400);
+            getServletContext().getRequestDispatcher("/400Error.jsp").forward(request, response);
         }
     }
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String data = Functions.getMessageBody(request);
         try {
+            //System.out.println(data);
             JSONObject json = Functions.stringToJson(data);
+            // System.out.println("how");
             Message m = Functions.jsonToMessage(json);
+            // System.out.println(m.toString());
+            // System.out.println("how2");
+            //MessageStorage.addMessage(m);
             MessageStorage.addMessageH(m);
             XMLStorage.addData(m);
-            MessageStorage.replaceMessage(m.getId(), m);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("text/html");
+            response.setStatus(400);
+            getServletContext().getRequestDispatcher("/400Error.jsp").forward(request, response);
         }
     }
 
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String data = Functions.getMessageBody(request);
+        try {
+            //System.out.println(data);
+            JSONObject json = Functions.stringToJson(data);
+            // System.out.println("how");
+            Message m = Functions.jsonToMessage(json);
+            // System.out.println(m.toString());
+            // System.out.println("how2");
+            //MessageStorage.addMessage(m);
+            MessageStorage.addMessageH(m);
+            XMLStorage.addData(m);
+            response.setStatus(HttpServletResponse.SC_OK);
+        } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
+            response.setContentType("text/html");
+            response.setStatus(400);
+            getServletContext().getRequestDispatcher("/400Error.jsp").forward(request, response);
+        }
     }
 
     private String formResponse(int index) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Functions.MESSAGES, MessageStorage.getSubMessages(index));
-        jsonObject.put("action_id", MessageStorage.getCurAction());
+        jsonObject.put("actionId", MessageStorage.getCurAction());
+
         return jsonObject.toJSONString();
     }
 
     private void loadHistory() throws SAXException, IOException, ParserConfigurationException, TransformerException {
         if (XMLStorage.doesStorageExist()) {
             MessageStorage.addAll(XMLStorage.getMessages());
-            MessageStorage.addAllH(MessageStorage.getStorage());
+            MessageStorage.addAllH(XMLStorage.getMessages());
         } else {
             XMLStorage.createStorage();
         }

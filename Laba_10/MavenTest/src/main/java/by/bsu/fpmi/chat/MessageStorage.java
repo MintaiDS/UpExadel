@@ -19,7 +19,7 @@ public class MessageStorage {
     }
 
     public static List<Message> getStorage() {
-        return Messages;
+        return history;
     }
 
     public static int getCurId() {
@@ -49,12 +49,12 @@ public class MessageStorage {
     }
 
     public static List<Message> getSubMessages(int index) {
-        return history.subList(index, Messages.size());
+        return history.subList(index, history.size());
     }
 
     public static void replaceMessage(String id, Message message) {
         for (Message m: Messages) {
-            if (m.getId().equals(id)) {
+            if (m.getMessageId().equals(id)) {
                 m = message;
                 return ;
             }

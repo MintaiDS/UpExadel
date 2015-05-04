@@ -1,78 +1,71 @@
-//ALL UI LOGIC
-//ALL DAY
+//UI LOGIC
 
 
 // ----------- VARS
 
 var chatView;  
 var messageList = [];
-var globalmessageID = 0;
+//var globalmessageID = 0;
 
 var editMode = false;
 var settingsMode = false;
 
-var actionID = 0;
+var actionId = 0;
 
 var currentUserName;
 
-var session_id;
+//var session_id;
 
 // Struct for adding message to UI
-var newMessage = function (time,userName,messageID,messageText){
+var newMessage = function (date,username,messageId,messageText){
     return {
-        time: time,
-        userName: userName,
-        messageID: messageID,
-        messageText: messageText,
+        date: date,
+        username: username,
+        messageId: messageId,
+        messageText: messageText
         
     };
 };
 
 // Struct for sending message to server
-var newMessageSendRequest = function (session_id, username,room_id, messageText){
+var newMessageSendRequest = function (username, messageText){
     return {
-        session_id: session_id,
         message: JSON.stringify( {
             username : username,
-            room_id: String(room_id),
-            text: messageText,
-            status: "new",
-            
+            messageText: messageText,
+            status: "new"
         })
-        
+
     };
 };
 // Struct for deleting message from server
-var deleteMessageRequest = function (session_id, message_id){
+var deleteMessageRequest = function (username, messageId){
     return {
-        session_id: session_id,
         message: JSON.stringify( {
-            message_id: String(message_id),
-            status: "delete",
+            messageId: String(messageId),
+            username: username,
+            status: "delete"
         })
-        
     };
 };
 
-var editMessageRequest = function (session_id, message_id, newMessage){
+var editMessageRequest = function (username, messageId, messageText){
     return {
-        session_id: session_id,
         message: JSON.stringify( {
-            text: newMessage,
-            message_id: String(message_id),
-            status: "edit",
+            messageText: messageText,
+            messageId: String(messageId),
+            username: username,
+            status: "edit"
         })
-        
     };
 };
 
 
 
 // Struct for geting message from server
-var newGetRequest = function(action_id, username){
+var newGetRequest = function(actionId){
     return{
-        action_id: action_id,
-        username: username,    
+        actionId: actionId
     }
     
 }
@@ -108,7 +101,6 @@ $( document ).ready(function(){
     $("#CancelSettingsBtn").on('click', toggleSettings);
     
     run();
-    //alert(currentUserName);
 	   
 
 
@@ -120,17 +112,10 @@ function run() { // start of app. data restore.
     
     var data = restore() ;
     createAllMessages(data);
-
-    startSession(currentUserName); // post func - get session
-    
-    //if(session_id == -1){
-    //    return; // Error
-   // }
     
     setInterval(function(){ // Get Requset    
-       var getRequest = newGetRequest(actionID,currentUserName)
-       getAction(getRequest); // getNewActions 
-       
+       var getRequest = newGetRequest(actionId)
+       getAction(getRequest); // getNewActions
     }, 5000)
 }
 
@@ -149,16 +134,12 @@ function restore() {
 	}
     
 	var item = localStorage.getItem("data");
-    var messageIDopt = localStorage.getItem("messageID");
-    if (messageIDopt != null){
-        globalmessageID = messageIDopt;
-    }
-    var actionIDopt = localStorage.getItem("actionID");
+    var actionIDopt = localStorage.getItem("actionId");
     if (actionIDopt != null){
-        actionID = actionIDopt;
+        actionId = actionIDopt;
     }
     
-    var userNameopt = localStorage.getItem("userName");
+    var userNameopt = localStorage.getItem("username");
     if (userNameopt != null){
         currentUserName = userNameopt;
         $("#NameForm").val(currentUserName);
@@ -181,9 +162,8 @@ function store(){
 	}
 
 	localStorage.setItem("data", JSON.stringify(messageList));
-    localStorage.setItem("messageID", globalmessageID);
-    localStorage.setItem("actionID", actionID);
-    localStorage.setItem("userName", currentUserName);
+    localStorage.setItem("actionId", actionId);
+    localStorage.setItem("username", currentUserName);
 }
 
 function addMessageFromData(message){
@@ -191,9 +171,9 @@ function addMessageFromData(message){
     
 }
 
-function deleteFromList(messageID){
+function deleteFromList(messageId){
     for (var i = 0 ; i < messageList.length ; i++){
-        if (messageList[i].messageID == messageID){
+        if (messageList[i].messageId == messageId){
             messageList.splice(i,1);
             store();
             continue;
@@ -202,9 +182,9 @@ function deleteFromList(messageID){
 
 }
 
-function editInList(messageID,newText){
+function editInList(messageId,newText){
     for (var i = 0 ; i < messageList.length ; i++){
-        if (messageList[i].messageID == messageID){
+        if (messageList[i].messageId == messageId){
             messageList[i].messageText = newText;
             store();
             continue;
@@ -222,8 +202,8 @@ function postNewMessage(data){
     
     $.ajax({
     method: "POST",
-    url: "localhost:8080/chat",
-    data: data,    
+    url: "/chat",
+    data: data,
     success: function(data){
         if(data == 0){
         console.log('post message success');
@@ -237,17 +217,16 @@ function postNewMessage(data){
     });
 }
 
-function postDeleteMessage(data){ 
-    
-    //alert(JSON.stringify(message1));
+function postDeleteMessage(data){
     
     $.ajax({
     method: "POST",
-    url: "localhost:8080/chat",
-    data: data,    
+    url: "/chat",
+    data: data,
+
     success: function(data){
         if(data == 0){
-        console.log('del message succes');
+        console.log('del message success');
     } else {
         console.log('del error in success');
     }
@@ -265,11 +244,11 @@ function postEditMessage(data){
     
     $.ajax({
     method: "POST",
-    url: "localhost:8080/chat",
+    url: "/chat",
     data: data,
     success: function(data){
         if(data == 0){
-        console.log('edit message succes');
+        console.log('edit message success');
     } else {
         console.log('edit error in success');
     }
@@ -283,74 +262,51 @@ function postEditMessage(data){
 
 function getAction(getRequest){ 
     
-    //alert(JSON.stringify(message1));
+
     
     $.ajax({
     method: "GET",
-    url: "localhost:8080/chat",
+    url: "/chat",
     data: getRequest,
-    dataType: "html",
-    success: function(data){
-        //alert("getActionSucces" + data);
-        
-        
-        getActionFromServerWithJSON(data);
+
+    success: function(dataNew){
+
+        //alert("here1");
+        getActionFromServerWithJSON(dataNew);
+
         
     },
-    error: function(data){
+    error: function(dataNew){
         console.log("getAction: getError");
+        //alert(dataNew.text);
+        //document.write(dataNew);
+
     }    
     });
-}
-
-
-function startSession(username){
-    
-    
-    $.ajax({
-        url: "localhost:8080/chat",
-		method: "POST",
-        async : false, 
-		data: {username: username},
-		success: function(data) {
-			//alert("SessionID success" == data);
-            session_id = parseInt(data);
-		},
-		error: function(data) {
-			console.log("SessionID error");
-            session_id = -1;
-		}
-})
-    
-    
 }
 
 function getActionFromServerWithJSON(jsonData){
         if (jsonData.length == 0)
             return;
-        
-        
-        
-        var dataFromServer = $.parseJSON(jsonData);
-        var newMessages = dataFromServer["messages"];
-		var actionID = Math.max(actionID, dataFromServer["actionID"]);
+
+
+
+        var dataFromServer =jsonData;// $.parseJSON(jsonData);
+        var newMessages = dataFromServer.messages;
+		actionId = Math.max(actionId, dataFromServer.actionId);
+
         for( i = 0; i < newMessages.length; i++){
             
             var messageFromServer = newMessages[i];
-            
-            newActionId = parseInt(messageFromServer.action_id);
-			//actionID = Math.max(actionID, newActionId);
-            
-            
             var status = messageFromServer.status;
             //alert(status);
-            if(status == 1){ // NEW
+            if(status == "new"){ // NEW
             
                 
-                var message = newMessage(messageFromServer.time,
+                var message = newMessage(messageFromServer.date,
                                         messageFromServer.username,
-                                        messageFromServer.message_id,
-                                        messageFromServer.text);
+                                        messageFromServer.messageId,
+                                        messageFromServer.messageText);
 
 
 
@@ -360,14 +316,13 @@ function getActionFromServerWithJSON(jsonData){
                 
                 
                 
-                } else if (status == 3) { // DELETE
-                    var messageIDToDelete = messageFromServer.message_id;
-                    
+                } else if (status == "delete") { // DELETE
+                    var messageIDToDelete = messageFromServer.messageId;
                     deleteMessageByID(messageIDToDelete);
                     
-                } else if(status == 2){// EDIT 
-                    var messageIDToEdit = messageFromServer.message_id;
-                    var editMessageText = messageFromServer.text;
+                } else if(status == "edit"){// EDIT
+                    var messageIDToEdit = messageFromServer.messageId;
+                    var editMessageText = messageFromServer.messageText;
                     
                     editMessageByIDandNewText(messageIDToEdit,editMessageText);
                     
@@ -392,13 +347,13 @@ function addNewMessage(message){
 
     var messBlock = $(".media-list > .media:first").clone();
     messBlock.find(".message").text(message.messageText);
-    messBlock.find(".NickName").text(message.userName);
-    messBlock.find(".Time").text(message.time);
-    messBlock.attr("data-messageID",[message.messageID]);
+    messBlock.find(".NickName").text(message.username);
+    messBlock.find(".Time").text(message.date);
+    messBlock.attr("data-messageID",[message.messageId]);
      
     messBlock.removeClass("hidden"); 
     
-    if(currentUserName == message.userName){ // SameUser 
+    if(currentUserName == message.username){ // SameUser
     messBlock.find(".deleteMessage").click(userMessageDelete); 
     messBlock.find(".editMessage").click(userMessageEdit);
     } else { // Can't delete and edit this message
@@ -426,9 +381,8 @@ var userMessageSended = function(){ // new message sended by user
     
     
     
-    var prepareNewMessageForSend = newMessageSendRequest(session_id,
+    var prepareNewMessageForSend = newMessageSendRequest(
                                                         currentUserName,
-                                                        1,
                                                         messageForm.val());
                                                       
                                                       
@@ -468,21 +422,21 @@ var userMessageSended = function(){ // new message sended by user
 
 };
 
-function deleteMessageByID(messageID){
+function deleteMessageByID(messageId){
 
-    var messBlock = $(".media-list > .media[data-messageID="+messageID+"]");
+    var messBlock = $(".media-list > .media[data-messageID="+messageId+"]");
     //alert(messBlock.text());
     messBlock.remove();
-    deleteFromList(messageID);
+    deleteFromList(messageId);
     store();
     
 }
 
-function editMessageByIDandNewText(messageID, messageText){
+function editMessageByIDandNewText(messageId, text){
     //alert("new text = " + messageText);
-    var messBlock = $(".media-list > .media[data-messageID="+messageID+"]");
+    var messBlock = $(".media-list > .media[data-messageID="+messageId+"]");
     var textUI = messBlock.find(".message");
-    textUI.text(messageText);
+    textUI.text(text);
     
     
     editInList(messageIDtoEdit,messageToEditGlobal.text());
@@ -505,7 +459,7 @@ var userMessageDelete = function(evt){
     //messageToDelete.remove(); //TODO : - Awesome animation ASAP
     console.log('delete ' + messageIDtoDelete);
     
-    var messageToDeleteRequestData = deleteMessageRequest(session_id,messageIDtoDelete);
+    var messageToDeleteRequestData = deleteMessageRequest(currentUserName, messageIDtoDelete);
     postDeleteMessage(messageToDeleteRequestData);
     
 };
@@ -540,7 +494,7 @@ var editMessageEditMode = function(){ // EDIT MESSAGE
     messageToEditGlobal.text("Editing...");
     var messageIDtoEdit = parseInt(messageToEditGlobal.parents("li.media").attr("data-messageID"));
     
-    var editRequest = editMessageRequest(session_id, messageIDtoEdit, text);
+    var editRequest = editMessageRequest(currentUserName, messageIDtoEdit, text);
     postEditMessage(editRequest);
     
     
@@ -711,7 +665,7 @@ var toggleSettings = function(){
         settingsMode = true;
         $(".settings").css("bottom","120px");
         $(".settings").css("box-shadow", "0px 2px 3px #888888"); $("#SettingsButtonGlyph").addClass("coloredGlyph");
-        $( "#mainRow" ).transition({ y: settingsHeight,
+        $( "#mainRow" ).transition({ y: settingsHeight
                                    });
         
         $('.settings').transition({ opacity: 100 }, function(){

@@ -6,49 +6,52 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Message {
-    private String id;
-    private String author;
-    private String text;
+    private String messageId;
+    private String username;
+    private String messageText;
     private String date;
+    private String status;
 
-    public Message(String id, String author, String text) {
-        this.id = id;
-        this.author = author;
-        this.text = text;
+    public Message(String messageId, String username, String messageText, String status) {
+        this.messageId = messageId;
+        this.username = username;
+        this.messageText = messageText;
         Date nowDate = new Date();
-        SimpleDateFormat ftDate = new SimpleDateFormat("dd-mm-yyyy HH:mm");
+        SimpleDateFormat ftDate = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         this.date = ftDate.format(nowDate);
+        this.status = status;
     }
 
-    public Message(String id, String author, String text, String date) {
-        this.id = id;
-        this.author = author;
-        this.text = text;
+    public Message(String messageId, String username, String messageText, String date, String status) {
+        this.messageId = messageId;
+        this.username = username;
+        this.messageText = messageText;
         this.date = date;
+        this.status = status;
     }
 
-    public String getId() {
-        return id;
+    public String getMessageId() {
+        return messageId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getUsername() {
+        return username;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public String getText() {
-        return text;
+    public String getMessageText() {
+        return messageText;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setMessageText(String messageText) {
+        this.messageText = messageText;
     }
 
     public String getDate() {
@@ -59,8 +62,17 @@ public class Message {
         this.date = date;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
-        return this.date+"\t"+this.author+" : "+this.text;
+        return ("{\"date\":\""+this.date+"\",\"username\":\""+this.username+"\",\"messageId\":\""+this.messageId+
+                "\",\"messageText\":\""+this.messageText+"\",\"status\":\""+this.status+"\"}");
     }
 }

@@ -19,13 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class XMLStorage {
-    private static final String STORAGE_LOCATION = System.getProperty("user.home") +  File.separator + "history.xml"; // history.xml will be located in the home directory
+    private static final String STORAGE_LOCATION = System.getProperty("user.dir") +  File.separator + "history.xml"; // history.xml will be located in the home directory
     private static final String MESSAGES = "messages";
     private static final String MESSAGE = "content";
-    private static final String ID = "id";
-    private static final String AUTHOR = "author";
-    private static final String TEXT = "text";
+    private static final String MESSAGEID = "messageId";
+    private static final String USERNAME = "username";
+    private static final String MESSAGETEXT = "messageText";
     private static final String DATE = "date";
+    private static final String STATUS = "status";
 
     private XMLStorage() {
     }
@@ -56,19 +57,23 @@ public final class XMLStorage {
         Element messageElement = document.createElement(MESSAGE);
         root.appendChild(messageElement);
 
-        messageElement.setAttribute(ID, m.getId());
+        messageElement.setAttribute(MESSAGEID, m.getMessageId());
 
-        Element author = document.createElement(AUTHOR);
-        author.appendChild(document.createTextNode(m.getAuthor()));
-        messageElement.appendChild(author);
+        Element username = document.createElement(USERNAME);
+        username.appendChild(document.createTextNode(m.getUsername()));
+        messageElement.appendChild(username);
 
-        Element text = document.createElement(TEXT);
-        text.appendChild(document.createTextNode(m.getText()));
-        messageElement.appendChild(text);
+        Element messageText = document.createElement(MESSAGETEXT);
+        messageText.appendChild(document.createTextNode(m.getMessageText()));
+        messageElement.appendChild(messageText);
 
         Element date = document.createElement(DATE);
         date.appendChild(document.createTextNode(m.getDate()));
         messageElement.appendChild(date);
+
+        Element status = document.createElement(STATUS);
+        status.appendChild(document.createTextNode(m.getStatus()));
+        messageElement.appendChild(status);
 
         DOMSource source = new DOMSource(document);
 
@@ -83,7 +88,7 @@ public final class XMLStorage {
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         Document document = documentBuilder.parse(STORAGE_LOCATION);
         document.getDocumentElement().normalize();
-        Node messageToUpdate = getNodeById(document, m.getId());
+        Node messageToUpdate = getNodeById(document, m.getMessageId());
 
         if (messageToUpdate != null) {
 
@@ -93,16 +98,20 @@ public final class XMLStorage {
 
                 Node node = childNodes.item(i);
 
-                if (AUTHOR.equals(node.getNodeName())) {
-                    node.setTextContent(m.getAuthor());
+                if (USERNAME.equals(node.getNodeName())) {
+                    node.setTextContent(m.getUsername());
                 }
 
-                if (TEXT.equals(node.getNodeName())) {
-                    node.setTextContent(m.getText());
+                if (MESSAGETEXT.equals(node.getNodeName())) {
+                    node.setTextContent(m.getMessageText());
                 }
 
                 if (DATE.equals(node.getNodeName())) {
                     node.setTextContent(m.getDate());
+                }
+
+                if (STATUS.equals(node.getNodeName())) {
+                    node.setTextContent(m.getStatus());
                 }
 
             }
@@ -132,11 +141,12 @@ public final class XMLStorage {
         NodeList messageList = root.getElementsByTagName(MESSAGE);
         for (int i = 0; i < messageList.getLength(); i++) {
             Element messageElement = (Element) messageList.item(i);
-            String id = messageElement.getAttribute(ID);
-            String author = messageElement.getElementsByTagName(AUTHOR).item(0).getTextContent();
-            String text = messageElement.getElementsByTagName(TEXT).item(0).getTextContent();
+            String messageId = messageElement.getAttribute(MESSAGEID);
+            String username = messageElement.getElementsByTagName(USERNAME).item(0).getTextContent();
+            String messageText = messageElement.getElementsByTagName(MESSAGETEXT).item(0).getTextContent();
             String date = messageElement.getElementsByTagName(DATE).item(0).getTextContent();
-            messages.add(new Message(id, author, text, date));
+            String status = messageElement.getElementsByTagName(STATUS).item(0).getTextContent();
+            messages.add(new Message(messageId, username, messageText, date, status));
         }
         return messages;
     }
