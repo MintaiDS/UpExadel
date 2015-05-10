@@ -1,5 +1,6 @@
 package by.bsu.fpmi.chat;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.xml.sax.SAXException;
@@ -15,104 +16,87 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.Override;
 
+
 @WebServlet ("/chat")
 public class MyServlet extends HttpServlet {
+    private static Logger logger = Logger.getLogger(MyServlet.class.getName());
     @Override
     public void init() throws ServletException {
         try {
             loadHistory();
         } catch (SAXException | IOException | ParserConfigurationException | TransformerException e) {
-           System.err.println(e);
+           logger.error(e);
         }
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //try{
-            //response.setStatus(500);
-            //getServletContext().getRequestDispatcher("/500Error.jsp").forward(request, response);
-            String index = request.getParameter("actionId");
+        logger.info("Get request");
+        String index = request.getParameter("actionId");
+        logger.info("ActionId = "+ index);
         if (Integer.valueOf(index) > MessageStorage.getStorage().size())
         {
-            response.setContentType("text/html");
-            response.setStatus(500);
-            getServletContext().getRequestDispatcher("/500Error.jsp").forward(request, response);
+            response.setStatus(400);
+            logger.error("Bad ActionId");
         }else {
             String messages;
-            if (index != null) {
+            if (Integer.valueOf(index) < MessageStorage.getStorage().size()) {
                 messages = formResponse(Integer.valueOf(index));
+                response.setContentType("application/json");
+                PrintWriter out = response.getWriter();
+                out.print(messages);
+                out.flush();
             } else {
-                messages = formResponse(0);
+                response.setStatus(304);
             }
-            response.setContentType("application/json");
-            PrintWriter out = response.getWriter();
-            out.print(messages);
-            out.flush();
-       /* catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
-            System.out.println(e);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-        }*/
-            //System.out.println(messages);
+
         }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //System.out.println("some");
+        logger.info("Post Request");
         String data = Functions.getMessageBody(request);
+        logger.info(data);
         try {
-            //System.out.println(data);
             JSONObject json = Functions.stringToJson(data);
-           // System.out.println("how");
             Message m = Functions.jsonToMessage(json);
-           // System.out.println(m.toString());
-           // System.out.println("how2");
-            //MessageStorage.addMessage(m);
             MessageStorage.addMessageH(m);
             XMLStorage.addData(m);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
-            response.setContentType("text/html");
-            response.setStatus(400);
-            getServletContext().getRequestDispatcher("/400Error.jsp").forward(request, response);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+           logger.error(e);
         }
     }
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        logger.info("Put request");
         String data = Functions.getMessageBody(request);
+        logger.info(data);
         try {
-            //System.out.println(data);
             JSONObject json = Functions.stringToJson(data);
-            // System.out.println("how");
             Message m = Functions.jsonToMessage(json);
-            // System.out.println(m.toString());
-            // System.out.println("how2");
-            //MessageStorage.addMessage(m);
             MessageStorage.addMessageH(m);
             XMLStorage.addData(m);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
-            response.setContentType("text/html");
-            response.setStatus(400);
-            getServletContext().getRequestDispatcher("/400Error.jsp").forward(request, response);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            logger.error(e);
         }
     }
 
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        logger.info("Delete request");
         String data = Functions.getMessageBody(request);
+        logger.info(data);
         try {
-            //System.out.println(data);
             JSONObject json = Functions.stringToJson(data);
-            // System.out.println("how");
             Message m = Functions.jsonToMessage(json);
-            // System.out.println(m.toString());
-            // System.out.println("how2");
-            //MessageStorage.addMessage(m);
             MessageStorage.addMessageH(m);
             XMLStorage.addData(m);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
-            response.setContentType("text/html");
-            response.setStatus(400);
-            getServletContext().getRequestDispatcher("/400Error.jsp").forward(request, response);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            logger.error(e);
         }
     }
 

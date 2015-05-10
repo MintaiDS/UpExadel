@@ -119,7 +119,17 @@ function run() { // start of app. data restore.
     }, 5000)
 }
 
-
+function longPolling(getRequest) {
+    $.ajax({
+        method: "GET",
+        url: "/chat",
+        data: getRequest,
+        complete: function (data) {
+            longPolling(data)
+        },
+        timeout: 300000
+    });
+}
 function createAllMessages(data) {
     if (data != null) {
 	for(var i = 0; i < data.length; i++)
@@ -271,22 +281,19 @@ function getAction(getRequest){
 
     success: function(dataNew){
 
-        //alert("here1");
         getActionFromServerWithJSON(dataNew);
 
         
     },
     error: function(dataNew){
         console.log("getAction: getError");
-        //alert(dataNew.text);
-        //document.write(dataNew);
 
     }    
     });
 }
 
 function getActionFromServerWithJSON(jsonData){
-        if (jsonData.length == 0)
+        if (!jsonData)
             return;
 
 
@@ -388,9 +395,7 @@ var userMessageSended = function(){ // new message sended by user
                                                       
                         
                                   
-//    if (message.messageText.length == 0){
-//        return;
-//    }
+
     
     if(!isMessageValid(prepareNewMessageForSend.message)){
         
@@ -400,10 +405,6 @@ var userMessageSended = function(){ // new message sended by user
     messageForm.val("");
     
 
-    //checkServerStatus();
-    
-   // postAction(action);
-    //addNewMessage(message);
     
     postNewMessage(prepareNewMessageForSend);
     
@@ -541,30 +542,9 @@ function UIToggleEditMode(){
 
 
 
-// Does not work. Need to teach server to make callbacks.
-var serverURL = "";
-function checkServerStatus(){ // Rethink
-    $.ajax({url: serverURL,
-        type: "HEAD",
-        timeout:1000,
-        statusCode: {
-            200: function (response) {
-                console.log('Working!');
-            },
-            400: function (response) {
-                console.log('Not working!');
-            },
-            0: function (response) {
-                console.log('Not working!');
-            }              
-        }
- });
-}
 
 
-
-// ----------- UI details you do not need to carry about. 
-// Really. Don't
+// ----------- UI details
 
  var handleChatSize = function handleChatSize(){
         
