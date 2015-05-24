@@ -125,6 +125,16 @@ public final class XMLStorage {
             throw new NullPointerException();
         }
     }
+    public static synchronized void deleteData(Message m) throws ParserConfigurationException, SAXException, IOException, TransformerException, XPathExpressionException {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        Document document = documentBuilder.parse(STORAGE_LOCATION);
+        document.getDocumentElement().normalize();
+        Node messageToUpdate = getNodeById(document, m.getMessageId());
+        if (messageToUpdate != null){
+            document.removeChild(messageToUpdate);
+        }
+    }
 
     public static synchronized boolean doesStorageExist() {
         File file = new File(STORAGE_LOCATION);
