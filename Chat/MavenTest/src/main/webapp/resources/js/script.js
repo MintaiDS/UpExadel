@@ -90,7 +90,7 @@ function run() { // start of app. data restore.
 function longPolling() {
     var xhr = new XMLHttpRequest();
     xhr.open("get","/chat",true);
-    xhr.timeout = 300000;
+    xhr.timeout = 3000000;
     xhr.send();
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
