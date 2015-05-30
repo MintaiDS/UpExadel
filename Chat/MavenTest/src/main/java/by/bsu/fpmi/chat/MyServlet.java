@@ -105,7 +105,6 @@ public class MyServlet extends HttpServlet {
             }
         }
     }
-    //Not used because of js strange behaviour
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info("Put request");
         try(BufferedReader br = request.getReader()) {
@@ -117,14 +116,13 @@ public class MyServlet extends HttpServlet {
                 DBChanges.update(m);
                 DBChanges.add(Functions.DBCHANGES, m);
                 Functions.startResponse();
-                MessageStorage.getStorage().clear();
-            } catch (ParseException e){//| ParserConfigurationException | SAXException | TransformerException | XPathExpressionException e) {
+                DBChanges.deleteAll(Functions.DBCHANGES);
+            } catch (ParseException e){
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 logger.error(e);
             }
         }
     }
-    //Not used because of js strange behaviour
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info("Delete request");
         try(BufferedReader br = request.getReader()) {
@@ -136,7 +134,7 @@ public class MyServlet extends HttpServlet {
                 DBChanges.delete(Integer.parseInt(m.getMessageId()));
                 DBChanges.add(Functions.DBCHANGES, m);
                 Functions.startResponse();
-                MessageStorage.getStorage().clear();
+                DBChanges.deleteAll(Functions.DBCHANGES);
             } catch (ParseException e){
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 logger.error(e);
@@ -147,6 +145,7 @@ public class MyServlet extends HttpServlet {
     @Override
     public void destroy() {
         DBChanges.deleteAll(Functions.DBCHANGES);
+        DBChanges.freeAll();
         super.destroy();
     }
 }

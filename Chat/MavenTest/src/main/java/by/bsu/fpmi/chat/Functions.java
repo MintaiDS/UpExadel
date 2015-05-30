@@ -20,11 +20,13 @@ import org.xml.sax.SAXException;
 public class Functions {
     public static final String MESSAGES = "messages";
     public static final String USERNAME = "username";
+    public static final String USER = "user";
     public static final String MESSAGETEXT = "messageText";
     public static final String MESSAGEID = "messageId";
     public static final String STATUS = "status";
     public static final String DB = "messages";
     public static final String DBCHANGES = "changes";
+    public static final String DBUSERS = "users";
     private static HashMap<Integer, AsyncContext> asyncMap = new HashMap<Integer, AsyncContext>();
     private static Integer keyNumber = 0;
     public static String getMessageBody(HttpServletRequest request) throws IOException {
@@ -56,12 +58,13 @@ public class Functions {
             }
             id = json.get(MESSAGEID);
         }
-        Object author = json.get(USERNAME);
-        if (id != null && author != null && text != null) {
+        Object username = json.get(USERNAME);
+        Object user = json.get(USER);
+        if (id != null && username != null && user != null && text != null) {
             if (isNew) {
                 MessageStorage.incId();
             }
-            return new Message( id.toString(), author.toString(),  text.toString(), status.toString());
+            return new Message( id.toString(), username.toString(), user.toString(), text.toString(), status.toString());
         }
         return null;
     }

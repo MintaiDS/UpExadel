@@ -198,6 +198,9 @@ div.line{
     color: #FF6602;
     letter-spacing: normal;
 }
+.Name {
+    visibility: hidden;
+}
 
 .media-body {
     padding-left: 10px;
@@ -324,7 +327,9 @@ div.line{
     padding-right: 30px;
 }
 
-
+#LogoutBtn {
+    margin-top: 18px;
+}
 
 
 

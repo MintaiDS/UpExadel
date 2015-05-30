@@ -8,46 +8,45 @@ var messageList = [];
 var editMode = false;
 var settingsMode = false;
 var currentUserName;
-
-var newUser = function () {
-    return {
-        status: "new"
-    };
-};
+var currentUser;
 
 // Struct for adding message to UI
-var newMessage = function (date,username,messageId,messageText){
+var newMessage = function (date, username, user, messageId, messageText){
     return {
         date: date,
         username: username,
+        user: user,
         messageId: messageId,
         messageText: messageText
     };
 };
 
 // Struct for sending message to server
-var newMessageSendRequest = function (username, messageText){
+var newMessageSendRequest = function (username, user, messageText){
 
     return  JSON.stringify({
             username: username,
+            user: user,
             messageText: messageText,
             status: "new"
         });
 };
 // Struct for deleting message from server
-var deleteMessageRequest = function (username, messageId){
+var deleteMessageRequest = function (username, user, messageId){
     return  JSON.stringify( {
             messageId: String(messageId),
             username: username,
+            user: user,
             status: "delete"
         });
 };
 
-var editMessageRequest = function (username, messageId, messageText){
+var editMessageRequest = function (username, user, messageId, messageText){
     return  JSON.stringify( {
             messageText: messageText,
             messageId: String(messageId),
             username: username,
+            user: user,
             status: "edit"
         });
 };
@@ -64,7 +63,6 @@ $( document ).ready(function(){
     //NewMessageAdd
     $("#SendBtn").click(userMessageSended);
     registerKeyPress(editMode);
-
 //Additional setup
     $("#EditBtn").click(editMessageEditMode);
     $("#CancelEditBtn").click(cancelEditMode);
@@ -73,6 +71,7 @@ $( document ).ready(function(){
     $('.SettingsButton').on('click', toggleSettings);
     $("#NameSettingsApply").on('click', applySettings);
     $("#CancelSettingsBtn").on('click', toggleSettings);
+    $("#LogoutBtn").on('click',sendLogout);
 
     run();
 });
@@ -83,7 +82,7 @@ function run() { // start of app. data restore.
     
     restore() ;
     checkForEditing(currentUserName);
-    getAction(newUser());
+    getAction();
     longPolling();
 }
 
@@ -105,26 +104,16 @@ function longPolling() {
         }
     };
 }
-function createAllMessages(data) {
-    if (data != null) {
-	for(var i = 0; i < data.length; i++)
-		addMessageFromData(data[i]);
-    }
-}
 
 function restore() {
 	if(typeof(Storage) == "undefined") {
 		console.log('localStorage is not accessible');
 		return;
 	}
-
+    currentUser = localStorage.getItem("user");
     var userNameopt = localStorage.getItem("username");
-    if (userNameopt != null){
         currentUserName = userNameopt;
         $("#NameForm").val(currentUserName);
-    } else {
-        currentUserName = "GuestUser";
-    }
 }
 
 function store(){
@@ -134,10 +123,6 @@ function store(){
 	}
 
     localStorage.setItem("username", currentUserName);
-}
-
-function addMessageFromData(message){
-    addNewMessage(message);
 }
 
 function deleteFromList(messageId){
@@ -160,7 +145,7 @@ function editInList(messageId,newText){
 function postNewMessage(data){
     var xhr = new XMLHttpRequest();
     xhr.open("post","/chat",true);
-    xhr.setRequestHeader('Content-Type', 'text');
+    xhr.setRequestHeader('Content-Type', 'text/plain');
     xhr.send(data);
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
@@ -177,7 +162,7 @@ function postNewMessage(data){
 function postDeleteMessage(data){
     var xhr = new XMLHttpRequest();
     xhr.open("post","/chat",true);
-    xhr.setRequestHeader('Content-Type', 'text');
+    xhr.setRequestHeader('Content-Type', 'text/plain');
     xhr.send(data);
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
@@ -195,7 +180,7 @@ function postDeleteMessage(data){
 function postEditMessage(data){
     var xhr = new XMLHttpRequest();
     xhr.open("post","/chat",true);
-    xhr.setRequestHeader('Content-Type', 'text');
+    xhr.setRequestHeader('Content-Type', 'text/plain');
     xhr.send(data);
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
@@ -209,10 +194,10 @@ function postEditMessage(data){
     };
 }
 
-function getAction(getRequest){
+function getAction(){
     var xhr = new XMLHttpRequest();
     xhr.open("get","/chat"+"?status=new",true);
-    xhr.send(getRequest);
+    xhr.send();
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
             if (xhr.status == "200") {
@@ -238,6 +223,7 @@ function getActionFromServerWithJSON(jsonData){
             if(status == "new"){ // NEW
                 var message = newMessage(messageFromServer.date,
                                         messageFromServer.username,
+                                        messageFromServer.user,
                                         messageFromServer.messageId,
                                         messageFromServer.messageText);
                 addNewMessage(message);
@@ -251,16 +237,31 @@ function getActionFromServerWithJSON(jsonData){
                 }
         }
     }
-
+    function sendLogout(){
+    var xhr = new XMLHttpRequest();
+    xhr.open("post","/logout",true);
+    xhr.send();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+            if (xhr.status == "200") {
+                location.replace(xhr.responseText);
+            }
+            else {
+                console.log('logout error');
+            }
+        }
+    };
+}
 // UI
 function addNewMessage(message){
     var messBlock = $(".media-list > .media:first").clone();
     messBlock.find(".message").text(message.messageText);
     messBlock.find(".NickName").text(message.username);
+    messBlock.find(".Name").text(message.user);
     messBlock.find(".Time").text(message.date);
     messBlock.attr("data-messageID",[message.messageId]);
     messBlock.removeClass("hidden");
-    if(currentUserName == message.username){ // SameUser
+    if(currentUser == message.user){ // SameUser
     messBlock.find(".deleteMessage").click(userMessageDelete); 
     messBlock.find(".editMessage").click(userMessageEdit);
     } else { // Can't delete and edit this message
@@ -271,30 +272,27 @@ function addNewMessage(message){
     messageList.push(message);
 	scrollToBottom(chatView,false);
 }
-function checkForEditing (username){
+function checkForEditing (user){
     var messBlock = $(".media-list");
     for (i = 0; i < messBlock.length; i++){
         var message = messBlock[i];
-        if (username == message.username){
+        if (user == message.user){
             messBlock.find(".deleteMessage").click(userMessageDelete);
             messBlock.find(".editMessage").click(userMessageEdit);
         }
     }
 }
-var userMessageSended = function(){ // new message sended by user
+var userMessageSended = function() { // new message sended by user
     var messageForm = $("#MessageForm");
-if (nameCheck(currentUserName)) {
     if (isMessageValid(messageForm.val())) {
         var prepareNewMessageForSend = newMessageSendRequest(
             currentUserName,
+            currentUser,
             messageForm.val());
         messageForm.val("");
         postNewMessage(prepareNewMessageForSend);
-        scrollToBottom(chatView,true);
+        scrollToBottom(chatView, true);
         messageFormRefresh();
-    }
-}  else {
-         alert ("Choose a name first!");
     }
 };
 
@@ -321,12 +319,8 @@ var userMessageDelete = function(){
     var messageToDelete = $(this).parents("li.media");
     var messageIDtoDelete = parseInt(messageToDelete.attr("data-messageID"));
     console.log('delete ' + messageIDtoDelete);
-    if (nameCheck(currentUserName)) {
-        var messageToDeleteRequestData = deleteMessageRequest(currentUserName, messageIDtoDelete);
+        var messageToDeleteRequestData = deleteMessageRequest(currentUserName, currentUser, messageIDtoDelete);
         postDeleteMessage(messageToDeleteRequestData);
-    } else {
-        alert ("Choose a name first!");
-    }
 };
 
 var userMessageEdit = function(){ // ENTER EDIT MODE
@@ -346,12 +340,8 @@ var editMessageEditMode = function(){ // EDIT MESSAGE
         return;
     messageToEditGlobal.text("Editing...");
     var messageIDtoEdit = parseInt(messageToEditGlobal.parents("li.media").attr("data-messageID"));
-    if (nameCheck(currentUserName)) {
-        var editRequest = editMessageRequest(currentUserName, messageIDtoEdit, text);
+        var editRequest = editMessageRequest(currentUserName, currentUser, messageIDtoEdit, text);
         postEditMessage(editRequest);
-    } else {
-        alert ("Choose a name first!");
-    }
     cancelEditMode();
 };
 
@@ -382,6 +372,8 @@ function UIToggleEditMode(){
         $("#CancelEditBtn").removeClass("hidden");
     }
 }
+
+
 
 // ----------- UI details
  var handleChatSize = function handleChatSize(){
@@ -462,12 +454,13 @@ var nameCheck = function(curUsername) {
 };
 var applySettings = function(){
     var newName = $("#NameForm").val();
+    if (isMessageValid(newName))
     currentUserName = newName;
     store();
     toggleSettings();
 };
     var isMessageValid = function(messageText){
-        if (messageText == "")
+        if (!messageText ||messageText == "")
             return false;
         if (messageText.length == 0 )
             return false;

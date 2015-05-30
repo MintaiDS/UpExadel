@@ -15,7 +15,7 @@
     <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
 
 </head>
-<body style="font-family:Droid Serif">
+<body style="font-family:Droid Serif" onunload="sendLogout()">
 
  <main> 
   <div class="container" style="Height:100vh; max-Width:724px;">
@@ -31,7 +31,7 @@
                 <a class="pull-left" href="#"><img class="media-object img-circle " src="resources/assets/img/ava.png" /></a>
                 <div class="media-body" >
                     <p class="MessageHeader">
-                        <span class="NickName">Anton Dosov</span> &middot <span class="Time"> 23:54  </span>
+                        <span class="NickName">Anton Dosov</span> <span class="Name" >Anton Dosov</span>&middot <span class="Time"> 23:54  </span>
                         <small class="text-muted pull-right"><span class="glyphicon glyphicon-edit editMessage" aria-hidden="true"></span>                             <span class="glyphicon glyphicon-remove deleteMessage" aria-hidden="true"></span></small> </p>
                         <span class="message">Can an iPhone app wake up its WatchKit extension and watch app?</span>
                         <br />
@@ -52,7 +52,8 @@
                             <div>
                             <button id="SendBtn" type ="submit" align="right" class="btn btn-info  btn-sm custom pull-right "> Speak </button>
                             <button id="EditBtn" type ="submit" align="right" class="btn btn-info  btn-sm custom pull-right hidden "> Edit </button>
-                            <button id="CancelEditBtn" type ="submit" align="right" class="btn btn-info  btn-sm   pull-right hidden"> Cancel </button>    
+                            <button id="CancelEditBtn" type ="submit" align="right" class="btn btn-info  btn-sm   pull-right hidden"> Cancel </button>
+                            <button id="LogoutBtn" type ="submit" align="left" class="btn btn-info  btn-sm custom pull-right "> Logout </button>
                             </div>
                             </div>
                 </div>
@@ -66,7 +67,7 @@
                 <div class="col-xs-10">
                     <div class="media NameChangeForm">
                         <a class="pull-left" href="#">
-                            <img class="media-object img-circle img-nameForm " src="resources/assets/img/anton.jpg" />                           </a>
+                            <img class="media-object img-circle img-nameForm " src="resources/assets/img/ava.png"  />                           </a>
                             <div class="media-body" style="max-Width: 300px" >
                                 <input class="form-control"  id="NameForm" placeholder="Your Beautiful Name Is ..."  >
                                 </input>

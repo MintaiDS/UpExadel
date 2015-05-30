@@ -24,6 +24,7 @@ public final class XMLStorage {
     private static final String MESSAGE = "content";
     private static final String MESSAGEID = "messageId";
     private static final String USERNAME = "username";
+    private static final String USER = "user";
     private static final String MESSAGETEXT = "messageText";
     private static final String DATE = "date";
     private static final String STATUS = "status";
@@ -63,6 +64,10 @@ public final class XMLStorage {
         username.appendChild(document.createTextNode(m.getUsername()));
         messageElement.appendChild(username);
 
+        Element user = document.createElement(USER);
+        user.appendChild(document.createTextNode(m.getUser()));
+        messageElement.appendChild(user);
+
         Element messageText = document.createElement(MESSAGETEXT);
         messageText.appendChild(document.createTextNode(m.getMessageText()));
         messageElement.appendChild(messageText);
@@ -100,6 +105,10 @@ public final class XMLStorage {
 
                 if (USERNAME.equals(node.getNodeName())) {
                     node.setTextContent(m.getUsername());
+                }
+
+                if (USER.equals(node.getNodeName())) {
+                    node.setTextContent(m.getUser());
                 }
 
                 if (MESSAGETEXT.equals(node.getNodeName())) {
@@ -153,10 +162,11 @@ public final class XMLStorage {
             Element messageElement = (Element) messageList.item(i);
             String messageId = messageElement.getAttribute(MESSAGEID);
             String username = messageElement.getElementsByTagName(USERNAME).item(0).getTextContent();
+            String user = messageElement.getElementsByTagName(USER).item(0).getTextContent();
             String messageText = messageElement.getElementsByTagName(MESSAGETEXT).item(0).getTextContent();
             String date = messageElement.getElementsByTagName(DATE).item(0).getTextContent();
             String status = messageElement.getElementsByTagName(STATUS).item(0).getTextContent();
-            messages.add(new Message(messageId, username, messageText, date, status));
+            messages.add(new Message(messageId, username, user, messageText, date, status));
         }
         return messages;
     }

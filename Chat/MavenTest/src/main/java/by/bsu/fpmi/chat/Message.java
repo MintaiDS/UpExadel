@@ -8,13 +8,15 @@ import java.util.Date;
 public class Message {
     private String messageId;
     private String username;
+    private String user;
     private String messageText;
     private String date;
     private String status;
 
-    public Message(String messageId, String username, String messageText, String status) {
+    public Message(String messageId, String username, String user, String messageText, String status) {
         this.messageId = messageId;
         this.username = username;
+        this.user = user;
         this.messageText = messageText;
         Date nowDate = new Date();
         SimpleDateFormat ftDate = new SimpleDateFormat("dd-MM-yyyy HH:mm");
@@ -22,9 +24,10 @@ public class Message {
         this.status = status;
     }
 
-    public Message(String messageId, String username, String messageText, String date, String status) {
+    public Message(String messageId, String username, String user, String messageText, String date, String status) {
         this.messageId = messageId;
         this.username = username;
+        this.user = user;
         this.messageText = messageText;
         this.date = date;
         this.status = status;
@@ -44,6 +47,14 @@ public class Message {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getMessageText() {
@@ -72,7 +83,7 @@ public class Message {
 
     @Override
     public String toString() {
-        return ("{\"date\":\""+this.date+"\",\"username\":\""+this.username+"\",\"messageId\":\""+this.messageId+
+        return ("{\"date\":\""+this.date+"\",\"username\":\""+this.username+"\",\"user\":\""+this.user+"\",\"messageId\":\""+this.messageId+
                 "\",\"messageText\":\""+this.messageText+"\",\"status\":\""+this.status+"\"}");
     }
 }
