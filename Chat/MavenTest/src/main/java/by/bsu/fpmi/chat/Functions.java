@@ -1,21 +1,22 @@
 package by.bsu.fpmi.chat;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.concurrent.ThreadPoolExecutor;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.xml.sax.SAXException;
+
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 public class Functions {
     public static final String MESSAGES = "messages";
@@ -109,9 +110,35 @@ public class Functions {
             }
         }
     }
-    public static Integer addKey()
-    {
+    public static Integer addKey() {
         keyNumber++;
         return keyNumber;
+    }
+    static String createSalt(String str) {
+        int mn = Math.min(str.length(), 10);
+        int key = 0;
+        for (int i = 0; i < mn; ++i){
+            key += str.charAt(i);
+        }
+        int len = str.length();
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < str.length(); i++)
+        {
+            if (i % 2 == 0)
+                buf.append(str.charAt(i));
+            else
+            buf.append((char)(33+(key+len)%31));
+        }
+        return buf.toString();
+    }
+    static String hashAndSalt(String salt, String password) throws NoSuchAlgorithmException {
+        MessageDigest mDigest = null;
+        mDigest = MessageDigest.getInstance("SHA1");
+        byte[] result = mDigest.digest((salt+password).getBytes());
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < result.length; i++) {
+            sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        return sb.toString();
     }
 }

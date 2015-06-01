@@ -1,6 +1,7 @@
 package by.bsu.fpmi.chat;
 
 
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,8 @@ public class DBChanges {
             {
                 String pass = resultSet.getString("password");
                 boolean inUse = resultSet.getBoolean("inUse");
+                String salt = Functions.createSalt(user);
+                password = Functions.hashAndSalt(salt,password);
                 if (password.equals(pass) && !inUse)
                 {
                     preparedStatement = connection.prepareStatement("UPDATE " + Functions.DBUSERS +" SET inUse = TRUE WHERE user = ?");
@@ -33,7 +36,9 @@ public class DBChanges {
             }
         } catch (SQLException e) {
             MyServlet.logger.error(e);
-        } finally {
+        }  catch (NoSuchAlgorithmException e) {
+            MyServlet.logger.error(e);
+        }  finally {
             if (preparedStatement != null) {
                 try {
                     preparedStatement.close();
@@ -67,12 +72,16 @@ public class DBChanges {
                     isGood = false;
             }
             else {
+                String salt = Functions.createSalt(user);
+                password = Functions.hashAndSalt(salt,password);
                 preparedStatement = connection.prepareStatement("INSERT INTO " + Functions.DBUSERS + "(user, password, inUse) VALUES(?,?,FALSE)");
                 preparedStatement.setString(1, user);
                 preparedStatement.setString(2, password);
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
+            MyServlet.logger.error(e);
+        } catch (NoSuchAlgorithmException e) {
             MyServlet.logger.error(e);
         } finally {
             if (preparedStatement != null) {
@@ -291,14 +300,10 @@ public class DBChanges {
     public static void freeAll() {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
         try {
             connection = ConnectionPool.getConnection();
-            if (resultSet.next())
-            {
-                preparedStatement = connection.prepareStatement("UPDATE " + Functions.DBUSERS + " SET inUse = FALSE ");
-                preparedStatement.executeUpdate();
-            }
+            preparedStatement = connection.prepareStatement("UPDATE " + Functions.DBUSERS + " SET inUse = FALSE ");
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             MyServlet.logger.error(e);
         } finally {
